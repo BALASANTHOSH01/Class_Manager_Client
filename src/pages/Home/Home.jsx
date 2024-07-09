@@ -1,16 +1,10 @@
-import CM_logo from "../../../public/CM_logo.png";
+import { Footer, NavBar } from "../../components/Layouts/index.js";
 
 const Home = () => {
   return (
     <div>
-        <div className=" flex flex-row gap-2 items-center">
-            <img src={CM_logo} alt="Logo" className=""/>
-            <div className=" felx flex-row items-center gap-1">Class
-                <p className="">
-                Manager
-                </p>
-            </div>
-        </div>
+       <NavBar/>
+       <Footer/>
     </div>
   )
 }

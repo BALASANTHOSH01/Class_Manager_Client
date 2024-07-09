@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+:root{
+  --primary-purpel:#912BBC;
+  --secondary-color:#ff7ae9;
+  --third-color:white;
+};
