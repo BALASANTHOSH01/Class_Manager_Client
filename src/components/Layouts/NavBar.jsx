@@ -15,7 +15,7 @@ const NavBar = () => {
   const navItems = [
     { name: "Solutions", key: "solutions" },
     { name: "About", key: "about" },
-    { name: "Resources", key: "resources" },
+    { name: "Contact Sales", key: "contact sales" },
   ];
 
   return (
@@ -50,12 +50,15 @@ const NavBar = () => {
       </div>
 
       <div className="flex flex-row items-center w-[30%] justify-end">
-        <motion.div
-          whileTap={{ scale: 0.6 }}
-          className="bg-gray-500 text-white hover:text-white cursor-pointer w-[160px] text-center py-[20px]"
-        >
-          <p>Contact Sales</p>
-        </motion.div>
+        <Link to={"/auth/login"}>
+          <motion.div
+            whileTap={{ scale: 0.6 }}
+            className="bg-gray-500 text-white hover:text-white cursor-pointer w-[160px] text-center py-[20px]"
+          >
+            <p>Login</p>
+          </motion.div>
+        </Link>
+
         <Link to={"/auth/register"}>
           <motion.div
             whileTap={{ scale: 0.6 }}
