@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CommonFields, DynamicFields } from '../index.js';
 import { PopupMSG } from '../../ReusableComponents/index.js';
+import {filteredRegisterForm} from '../../../utils/index.js';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const Register = () => {
     password: "",
     pincode: "",
     college_code: "",
-    mobile: "",
+    phoneNumber: "",
     institute: "",
     rollno: "",
     department: "",
@@ -41,6 +42,7 @@ const Register = () => {
       ...prev,
       [name]: value
     }));
+    
   };
 
   const closePopup = () => {
@@ -49,7 +51,7 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("formData :", formData);
+    const data = filteredRegisterForm({data:formData,userType:userType});
   };
 
   return (
