@@ -4,9 +4,9 @@ const PopupMSG = ({ color, value, closePopup }) => {
   return (
     <div>
       <div
-        className={`flex flex-row gap-4 w-[200px] px-[5px] py-[5px] text-white items-center ${color}`}
+        className={`flex flex-row gap-4 w-[300px]  text-white items-center ${color} absolute top-[10%] left-[40%] justify-center`}
       >
-        <div className="p-1 rounded-[50%] hover:bg-white hover:text-red-500 cursor-pointer">
+        <div className="bg-white text-red-500 cursor-pointer absolute left-0 h-full flex flex-col justify-center items-center p-1 text-[24px] border border-red-500 font-bold">
           <CrossIcon onClick={closePopup} />
         </div>
 

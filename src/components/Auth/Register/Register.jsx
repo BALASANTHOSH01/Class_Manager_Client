@@ -1,76 +1,68 @@
-import  { useState } from 'react'
-import {CommonFields,DynamicFields} from '../index.js';
-import {PopupMSG} from '../../ReusableComponents/index.js';
-
+import { useState } from 'react';
+import { CommonFields, DynamicFields } from '../index.js';
+import { PopupMSG } from '../../ReusableComponents/index.js';
 
 const Register = () => {
-
-  const [formdata,setFormData]=useState({
-    name:"",
-    email:"",
-    password:"",
-    pincode:"",
-    college_code:"",
-    phoneNumber:"",
-    institute:"",
-    rollno:"",
-    department:"",
-    year:0,
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    pincode: "",
+    college_code: "",
+    mobile: "",
+    institute: "",
+    rollno: "",
+    department: "",
+    year: 0,
   });
 
-  const [userType,setUserType]=useState("");
-  const [formNumber,setFormNumber]=useState("one");
-  const [error,setError]=useState(false);
+  const [userType, setUserType] = useState("");
+  const [formNumber, setFormNumber] = useState("one");
+  const [error, setError] = useState(false);
 
-  const handleUserType = (type) =>{
+  const handleUserType = (type) => {
     setUserType(type);
   };
 
-  const handleFormNumber = (number) =>{
-    if(formdata.name && formdata.email && formdata.password && userType){
+  const handleFormNumber = (number) => {
+    if (formData.name && formData.email && formData.password && userType) {
       setFormNumber(number);
     } else {
       setError(true);
-      return
+      setTimeout(() => {
+        setError(false);
+      }, 2000);
     }
   };
 
-  const handleChange = (e) =>{
-    const {name,value}=e.target;
-    setFormData((prev)=>({
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]:value
+      [name]: value
     }));
   };
 
-  const closePopup = () =>{
+  const closePopup = () => {
     setError(false);
   };
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("formData :"+formdata);
+    console.log("formData :", formData);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {
-        error && <PopupMSG color={"bg-red-500"} value={"error"} closePopup={closePopup} />
-      }
-      {
-        formNumber === "one" && (
-
-          <CommonFields handleChange={handleChange} formdata={formdata} userType={userType} handleUserType={handleUserType} formNumber={formNumber} handleFormNumber={handleFormNumber} />
-        )
-      }
-      {
-        formNumber === "two" && (
-
-          <DynamicFields userType={userType} handleChange={handleChange} formdata={formdata} handleSubmit={handleSubmit}/>
-        )
-      }
+      {error && <PopupMSG color={"bg-red-500"} value={"All fields are required."} closePopup={closePopup} />}
+      {formNumber === "one" && (
+        <CommonFields handleChange={handleChange} formData={formData} userType={userType} handleUserType={handleUserType} handleFormNumber={handleFormNumber} />
+      )}
+      {formNumber === "two" && (
+        <DynamicFields userType={userType} handleChange={handleChange} formData={formData} setFormNumber={setFormNumber} />
+      )}
     </form>
-  )
+  );
 }
 
-export default Register
+export default Register;

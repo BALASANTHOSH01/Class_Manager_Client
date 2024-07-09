@@ -11,7 +11,7 @@ const InputField = ({ name, handlechange, value, type }) => {
         name={name}
         id={name}
         onChange={handlechange}
-        className=" px-[5px] py-[5px] outline-none border"
+        className=" px-[5px] py-[8px] outline-none border border-gray-400"
       />
     </div>
   );
