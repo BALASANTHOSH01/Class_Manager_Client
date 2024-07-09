@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import CM_logo from "../../../public/CM_logo.png";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
-  const [activeNav, setActiveNav] = useState(() => localStorage.getItem("activeNav") || "solutions");
+  const [activeNav, setActiveNav] = useState(
+    () => localStorage.getItem("activeNav") || "solutions"
+  );
 
   useEffect(() => {
     localStorage.setItem("activeNav", activeNav);
@@ -30,7 +33,7 @@ const NavBar = () => {
           </div>
         </div>
 
-        {navItems.map(item => (
+        {navItems.map((item) => (
           <div
             key={item.key}
             className={`cursor-pointer w-[150px] text-center py-[20px] hover:bg-gray-500 ${
@@ -53,12 +56,14 @@ const NavBar = () => {
         >
           <p>Contact Sales</p>
         </motion.div>
-        <motion.div
-          whileTap={{ scale: 0.6 }}
-          className="bg-[--primary-purpel] text-white cursor-pointer w-[160px] text-center py-[20px]"
-        >
-          <p>Register</p>
-        </motion.div>
+        <Link to={"/auth/register"}>
+          <motion.div
+            whileTap={{ scale: 0.6 }}
+            className="bg-[--primary-purpel] text-white cursor-pointer w-[160px] text-center py-[20px]"
+          >
+            <p>Register</p>
+          </motion.div>
+        </Link>
       </div>
     </div>
   );
