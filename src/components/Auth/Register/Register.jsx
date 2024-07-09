@@ -1,7 +1,13 @@
-import { useState } from 'react';
-import { CommonFields, DynamicFields } from '../index.js';
-import { PopupMSG } from '../../ReusableComponents/index.js';
-import {filteredRegisterForm} from '../../../utils/index.js';
+import { useState } from "react";
+import { CommonFields, DynamicFields } from "../index.js";
+import { PopupMSG } from "../../ReusableComponents/index.js";
+import { filteredRegisterForm } from "../../../utils/index.js";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCurrentUser,
+  setIsAuthenticate,
+} from "../../../features/user/userSlice.js";
+import { createUser } from "../../../api/auth/auth.js";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +26,8 @@ const Register = () => {
   const [userType, setUserType] = useState("");
   const [formNumber, setFormNumber] = useState("one");
   const [error, setError] = useState(false);
+
+  const dispatch = useDispatch();
 
   const handleUserType = (type) => {
     setUserType(type);
@@ -40,31 +48,72 @@ const Register = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
   };
 
   const closePopup = () => {
     setError(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = filteredRegisterForm({data:formData,userType:userType});
+    const data = filteredRegisterForm({ data: formData, userType: userType });
+
+    try {
+      const response = await createUser(data,userType);
+      console.log("response :"+response);
+
+      dispatch(setCurrentUser({ userData: data, userType: userType }));
+      dispatch(setIsAuthenticate({isAuthenticate:true}));
+
+      console.log("user created and set sucessfully.");
+
+      if(!response){
+        console.log("No response is found.");
+      }
+
+    } catch (error) {
+      console.log("error message :" + error.message);
+      throw new Error();
+    }
   };
+
+  // const userName = useSelector((state) => state.user.currentUser?.name); // Ensure accessing correct part of state
+  // const usertype = useSelector((state) => state.user.currentUserType); // Ensure accessing correct part of state
+  // const isAuth = useSelector((state) => state.user.isAuthenticate); // Ensure accessing correct part of state
+  // console.log("userName: " + userName);
+  // console.log("userType: " + usertype);
+  // console.log("isAuth: " + isAuth);
 
   return (
     <form onSubmit={handleSubmit}>
-      {error && <PopupMSG color={"bg-red-500"} value={"All fields are required."} closePopup={closePopup} />}
+      {error && (
+        <PopupMSG
+          color={"bg-red-500"}
+          value={"All fields are required."}
+          closePopup={closePopup}
+        />
+      )}
       {formNumber === "one" && (
-        <CommonFields handleChange={handleChange} formData={formData} userType={userType} handleUserType={handleUserType} handleFormNumber={handleFormNumber} />
+        <CommonFields
+          handleChange={handleChange}
+          formData={formData}
+          userType={userType}
+          handleUserType={handleUserType}
+          handleFormNumber={handleFormNumber}
+        />
       )}
       {formNumber === "two" && (
-        <DynamicFields userType={userType} handleChange={handleChange} formData={formData} setFormNumber={setFormNumber} />
+        <DynamicFields
+          userType={userType}
+          handleChange={handleChange}
+          formData={formData}
+          setFormNumber={setFormNumber}
+        />
       )}
     </form>
   );
-}
+};
 
 export default Register;
