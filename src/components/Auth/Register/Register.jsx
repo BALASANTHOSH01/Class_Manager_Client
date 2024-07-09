@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CommonFields, DynamicFields } from "../index.js";
 import { PopupMSG } from "../../ReusableComponents/index.js";
 import { filteredRegisterForm } from "../../../utils/index.js";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setCurrentUser,
   setIsAuthenticate,
