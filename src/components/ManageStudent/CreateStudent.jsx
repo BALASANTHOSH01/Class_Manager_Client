@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import { InputField, PopupMSG } from "../ReusableComponents";
 import { formInputValidation } from "../../utils";
 import {
@@ -7,79 +7,57 @@ import {
   SET_ERROR,
   SET_ERROR_MESSAGE,
   SET_LOADING,
+  SET_STUDENT_DATA,
 } from "./studentReducers";
 import { Loader } from "../Loader";
 
 const CreateStudent = () => {
-  const [studentData, setStudentData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    rollno: "",
-    year: 0,
-    department: "",
-    phoneNumber: "",
-    parentNumber: "",
-    institute: "",
-  });
 
   const [state, localDispatch] = useReducer(reducer, initialState);
-  const { loading, errorMessage, error } = state;
+  const { loading, errorMessage, error, studentData } = state;
 
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    setStudentData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    localDispatch({
+      type: SET_STUDENT_DATA,
+      payload: { name, value },
+    });
   };
 
-  const closePopup = () =>{
-    localDispatch({type: SET_ERROR,payload:false});
-  }
+  const closePopup = () => {
+    localDispatch({ type: SET_ERROR, payload: false });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     localDispatch({ type: SET_LOADING, payload: true });
     const errors = formInputValidation(studentData, "student");
 
     if (errors.length > 0) {
       localDispatch({ type: SET_ERROR_MESSAGE, payload: errors });
       localDispatch({ type: SET_ERROR, payload: true });
-      setTimeout(() => {
-          localDispatch({ type: SET_ERROR, payload: false });
-      }, 2000);
       localDispatch({ type: SET_LOADING, payload: false });
     } else {
       try {
         // create student using API
-        console.log("student data :"+studentData);
+        // console.log("student name :" + studentData.name);
 
-        setStudentData({
-          name: "",
-          email: "",
-          password: "",
-          rollno: "",
-          year: 0,
-          department: "",
-          phoneNumber: "",
-          parentNumber: "",
-          institute: "",
-        });
-
+        localDispatch({ type: SET_LOADING, payload: false });
         localDispatch({ type: SET_ERROR, payload: false });
         localDispatch({ type: SET_ERROR_MESSAGE, payload: [] });
+
       } catch (error) {
+
         localDispatch({
           type: SET_ERROR_MESSAGE,
           payload: ["Failed to create student"],
         });
-
         localDispatch({ type: SET_ERROR, payload: true });
-      }
+        localDispatch({ type: SET_LOADING, payload: false });
 
-      localDispatch({ type: SET_LOADING, payload: false });
+      }
     }
   };
 
