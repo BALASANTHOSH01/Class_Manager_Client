@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { CommonFields, DynamicFields } from "../index.js";
 import { PopupMSG } from "../../ReusableComponents/index.js";
-import { filteredRegisterForm } from "../../../utils/index.js";
+import { filteredRegisterForm, formInputValidation } from "../../../utils/index.js";
 import { useDispatch } from "react-redux";
 import {
   setCurrentUser,
   setIsAuthenticate,
 } from "../../../features/user/userSlice.js";
 import { createUser } from "../../../api/auth/auth.js";
+import Loader from "../../Loader/Loader.jsx";
 
 const Register = () => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,8 +29,8 @@ const Register = () => {
   const [userType, setUserType] = useState("");
   const [formNumber, setFormNumber] = useState("one");
   const [error, setError] = useState(false);
-
-  const dispatch = useDispatch();
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleUserType = (type) => {
     setUserType(type);
@@ -37,6 +40,7 @@ const Register = () => {
     if (formData.name && formData.email && formData.password && userType) {
       setFormNumber(number);
     } else {
+      setErrorMessages(["Please fill out all required fields."]);
       setError(true);
       setTimeout(() => {
         setError(false);
@@ -58,62 +62,79 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = formInputValidation(formData, userType);
+
+    if (errors.length > 0) {
+      setErrorMessages(errors);
+      setError(true);
+      setTimeout(() => {
+        setError(false);
+      }, 3000);
+      return;
+    }
+
     const data = filteredRegisterForm({ data: formData, userType: userType });
 
+    setLoading(true);
     try {
-      const response = await createUser(data,userType);
-      console.log("response :"+response);
+      const response = await createUser(data, userType);
 
-      dispatch(setCurrentUser({ userData: data, userType: userType }));
-      dispatch(setIsAuthenticate({isAuthenticate:true}));
-
-      console.log("user created and set sucessfully.");
-
-      if(!response){
+      if (!response) {
         console.log("No response is found.");
       }
 
+      dispatch(setCurrentUser({ userData: data, userType: userType }));
+      dispatch(setIsAuthenticate({ isAuthenticate: true }));
     } catch (error) {
+      setErrorMessages([error.message]);
+      setError(true);
+      setTimeout(() => {
+        setError(false);
+      }, 2000);
+      setLoading(false);
       console.log("error message :" + error.message);
-      throw new Error();
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const userName = useSelector((state) => state.user.currentUser?.name); // Ensure accessing correct part of state
-  // const usertype = useSelector((state) => state.user.currentUserType); // Ensure accessing correct part of state
-  // const isAuth = useSelector((state) => state.user.isAuthenticate); // Ensure accessing correct part of state
-  // console.log("userName: " + userName);
-  // console.log("userType: " + usertype);
-  // console.log("isAuth: " + isAuth);
+  if (loading) {
+    return <Loader />;
+  } else {
+    return (
+      <form onSubmit={handleSubmit}>
+        {error && (
+          <PopupMSG
+            color={"bg-red-500"}
+            value={errorMessages.length > 0 ? errorMessages : "Invalid Credentials"}
+            closePopup={closePopup}
+          />
+        )}
 
-  return (
-    <form onSubmit={handleSubmit}>
-      {error && (
-        <PopupMSG
-          color={"bg-red-500"}
-          value={"All fields are required."}
-          closePopup={closePopup}
-        />
-      )}
-      {formNumber === "one" && (
-        <CommonFields
-          handleChange={handleChange}
-          formData={formData}
-          userType={userType}
-          handleUserType={handleUserType}
-          handleFormNumber={handleFormNumber}
-        />
-      )}
-      {formNumber === "two" && (
-        <DynamicFields
-          userType={userType}
-          handleChange={handleChange}
-          formData={formData}
-          setFormNumber={setFormNumber}
-        />
-      )}
-    </form>
-  );
+        {formNumber === "one" && (
+          <CommonFields
+            handleChange={handleChange}
+            formData={formData}
+            userType={userType}
+            handleUserType={handleUserType}
+            handleFormNumber={handleFormNumber}
+            error={error}
+          />
+        )}
+
+        {formNumber === "two" && (
+          <DynamicFields
+            userType={userType}
+            handleChange={handleChange}
+            formData={formData}
+            setFormNumber={setFormNumber}
+            error={error}
+          />
+        )}
+      </form>
+    );
+  }
 };
 
 export default Register;

@@ -1,4 +1,4 @@
-const InputField = ({ name, handlechange, value, type }) => {
+const InputField = ({ name, handlechange, value, type,error }) => {
   return (
     <div className="flex flex-col gap-1">
       <label htmlFor={name}>
@@ -11,7 +11,7 @@ const InputField = ({ name, handlechange, value, type }) => {
         name={name}
         id={name}
         onChange={handlechange}
-        className="px-[5px] py-[8px] outline-none border border-gray-400"
+        className={`px-[5px] py-[8px] outline-none border ${error ? 'border-[2px] border-red-500':' border-gray-400 '}`}
       />
     </div>
   );

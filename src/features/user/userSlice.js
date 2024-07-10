@@ -1,12 +1,14 @@
 // src/features/user/userSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
+// initialState
 const initialState = {
-  currentUser: null,
+  currentUser: null, 
   currentUserType: "",
   isAuthenticate: false,
 };
 
+// redux slice
 const userSlice = createSlice({
   name: "user",
   initialState,
