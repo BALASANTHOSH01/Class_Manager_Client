@@ -6,6 +6,7 @@ export const SET_ERROR = "SET_ERROR";
 export const SET_ERROR_MESSAGE = "SET_ERROR_MESSAGE";
 export const SET_LOADING = "SET_LOADING";
 
+// initialState
 const initialState = {
   userType: "",
   formNumber: "one",
@@ -14,6 +15,7 @@ const initialState = {
   loading: false,
 };
 
+// reducer function
 const reducer = (state, action) => {
   switch (action.type) {
     case SET_USER_TYPE:

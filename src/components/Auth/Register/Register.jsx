@@ -141,7 +141,7 @@ const Register = () => {
         {error && (
           <PopupMSG
             color={"bg-red-500"}
-            value={
+            errors={
               errorMessages.length > 0 ? errorMessages : "Invalid Credentials"
             }
             closePopup={closePopup}
