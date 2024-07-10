@@ -1,18 +1,52 @@
-import { useState } from "react";
-import { CommonFields, DynamicFields } from "../index.js";
-import { PopupMSG } from "../../ReusableComponents/index.js";
-import { filteredRegisterForm, formInputValidation } from "../../../utils/index.js";
+// installed modules
+import { useReducer, useState } from "react";
 import { useDispatch } from "react-redux";
+
+// loader component
+import Loader from "../../Loader/Loader.jsx";
+
+// popup error indicator component
+import { PopupMSG } from "../../ReusableComponents/index.js";
+
+// utility part
+import {
+  filteredRegisterForm,
+  formInputValidation,
+} from "../../../utils/index.js";
+
+// redux part
 import {
   setCurrentUser,
   setIsAuthenticate,
 } from "../../../features/user/userSlice.js";
+
+// create user
 import { createUser } from "../../../api/auth/auth.js";
-import Loader from "../../Loader/Loader.jsx";
+
+// index file
+import {
+  CommonFields,
+  DynamicFields,
+  SET_ERROR,
+  SET_ERROR_MESSAGE,
+  SET_FORM_NUMBER,
+  SET_USER_TYPE,
+  SET_LOADING,
+  reducer,
+  initialState,
+} from "../index.js";
+
 
 const Register = () => {
   const dispatch = useDispatch();
 
+  // useReducer part
+  const [state, localDispatch] = useReducer(reducer, initialState);
+
+  // destructured state
+  const { userType, formNumber, error, errorMessages, loading } = state;
+
+  // form data state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,28 +60,21 @@ const Register = () => {
     year: 0,
   });
 
-  const [userType, setUserType] = useState("");
-  const [formNumber, setFormNumber] = useState("one");
-  const [error, setError] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+  // handle user type
   const handleUserType = (type) => {
-    setUserType(type);
+    localDispatch({ type: SET_USER_TYPE, payload: type });
   };
 
+  // handle form number
   const handleFormNumber = (number) => {
     if (formData.name && formData.email && formData.password && userType) {
-      setFormNumber(number);
+      localDispatch({ type: SET_FORM_NUMBER, payload: number });
     } else {
-      setErrorMessages(["Please fill out all required fields."]);
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 2000);
+      displayError(["Please fill out all required fields."]);
     }
   };
 
+  // updating state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -56,29 +83,42 @@ const Register = () => {
     }));
   };
 
-  const closePopup = () => {
-    setError(false);
+  // handle back
+  const handleBackForm = (formNumber) => {
+    localDispatch({ type: SET_FORM_NUMBER, payload: formNumber });
   };
 
+  // close popup
+  const closePopup = () => {
+    localDispatch({ type: SET_ERROR, payload: false });
+  };
+
+  //display error
+  const displayError = (messages) => {
+    localDispatch({ type: SET_ERROR_MESSAGE, payload: messages });
+    localDispatch({ type: SET_ERROR, payload: true });
+    setTimeout(() => {
+      localDispatch({ type: SET_ERROR, payload: false });
+    }, 3000);
+  };
+
+  // handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const errors = formInputValidation(formData, userType);
 
     if (errors.length > 0) {
-      setErrorMessages(errors);
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 3000);
+      displayError(errors);
       return;
     }
 
+    // filter register form
     const data = filteredRegisterForm({ data: formData, userType: userType });
 
-    setLoading(true);
+    localDispatch({ type: SET_LOADING, payload: true });
     try {
-      const response = await createUser(data, userType);
+      const response = await createUser(data, userType); // create user
 
       if (!response) {
         console.log("No response is found.");
@@ -87,27 +127,23 @@ const Register = () => {
       dispatch(setCurrentUser({ userData: data, userType: userType }));
       dispatch(setIsAuthenticate({ isAuthenticate: true }));
     } catch (error) {
-      setErrorMessages([error.message]);
-      setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 2000);
-      setLoading(false);
-      console.log("error message :" + error.message);
+      displayError([error.message]);
     } finally {
-      setLoading(false);
+      localDispatch({ type: SET_LOADING, payload: false });
     }
   };
 
   if (loading) {
-    return <Loader />;
+    return <Loader />; // Loading component
   } else {
     return (
       <form onSubmit={handleSubmit}>
         {error && (
           <PopupMSG
             color={"bg-red-500"}
-            value={errorMessages.length > 0 ? errorMessages : "Invalid Credentials"}
+            value={
+              errorMessages.length > 0 ? errorMessages : "Invalid Credentials"
+            }
             closePopup={closePopup}
           />
         )}
@@ -128,7 +164,7 @@ const Register = () => {
             userType={userType}
             handleChange={handleChange}
             formData={formData}
-            setFormNumber={setFormNumber}
+            handleBackForm={handleBackForm}
             error={error}
           />
         )}
