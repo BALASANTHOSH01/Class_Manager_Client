@@ -14,6 +14,10 @@ import { Login, Register } from "./components/Auth/index.js";
 import { Provider } from "react-redux";
 import store from "./app/store.js";
 import ProtectedRoute from "./components/ProtectedRoutes/ProtectedRoute.jsx";
+import StudentProfile from "./components/ManageStudent/StudentProfile.jsx";
+import StaffProfile from "./components/ManageStaff/StaffProfile.jsx";
+import AttendanceProfile from "./components/ManageAttendance/AttendanceProfile.jsx";
+import CreateStudent from "./components/ManageStudent/CreateStudent.jsx";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +47,22 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/manage-attendance",
         element: <ProtectedRoute element={<AttendanceManagement />} />,
+      },
+      {
+        path: "/dashboard/manage-student/:rollno",
+        element: <ProtectedRoute element={<StudentProfile />} />,
+      },
+      {
+        path: "/dashboard/manage-staff/:name",
+        element: <ProtectedRoute element={<StaffProfile />} />,
+      },
+      {
+        path: "/dashboard/manage-attendance/:studentID",
+        element: <ProtectedRoute element={<AttendanceProfile />} />,
+      },
+      {
+        path: "/dashboard/create-student",
+        element: <ProtectedRoute element={<CreateStudent />} />,
       },
     ],
   },
