@@ -41,7 +41,7 @@ const DashboardSideBar = ({isSideNavHovered,setIsSideNavHovered}) => {
           )
         }
 
-        <SideNavItem pageLink={"/dashboard"} icon={<LogoutIcon/>} name={isSideNavHovered && "Logout"} isSideNavHovered={isSideNavHovered} />
+        <SideNavItem pageLink={"/dashboard/logout"} icon={<LogoutIcon/>} name={isSideNavHovered && "Logout"} isSideNavHovered={isSideNavHovered} />
     </div>
   )
 }

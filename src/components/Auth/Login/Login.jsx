@@ -1,6 +1,6 @@
 import { useReducer, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // reusable input component
 import { InputField, PopupMSG } from "../../ReusableComponents/index";
@@ -31,6 +31,7 @@ import { displayError } from "../../../utils/displayError.js";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [state, localDispatch] = useReducer(reducer, initialState);
   const { userType, error, errorMessage, loading } = state;
 
@@ -78,10 +79,12 @@ const Login = () => {
       // redux user authenticate
       dispatch(setIsAuthenticate({ isAuthenticate: true }));
 
+      //redirect to dashboard
+      navigate("/dashboard");
+      localDispatch({ type: SET_LOADING, payload: true });
     } catch (error) {
       displayError(localDispatch, error.message);
-      localDispatch({ type: SET_ERROR_MESSAGE, payload: [error.message] });
-      localDispatch({ type: SET_ERROR, payload: true });
+      localDispatch({ type: SET_LOADING, payload: false });
 
       console.log("Error message: " + error.message);
     } finally {
@@ -103,7 +106,7 @@ const Login = () => {
         {error && (
           <PopupMSG
             color={"bg-red-500"}
-            errors={errorMessage.length > 0 ? errorMessage : ["Invalid Credentials"]}
+            errors={errorMessage.length > 0 ? "Something went wrong" : ["Invalid Credentials"]}
             closePopup={closePopup}
           />
         )}

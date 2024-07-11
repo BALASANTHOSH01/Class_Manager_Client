@@ -7,20 +7,21 @@ import {
   SET_ERROR,
   SET_ERROR_MESSAGE,
   SET_LOADING,
-  SET_STUDENT_DATA,
-} from "./studentReducers";
+  SET_ATTENDANCE_DATA,
+} from "./attendanceReducers";
 import { Loader } from "../Loader";
+import { attendanceValidation } from "../../utils";
 
-const CreateStudent = () => {
-
+const CreateAttendance = () => {
   const [state, localDispatch] = useReducer(reducer, initialState);
-  const { loading, errorMessage, error, studentData } = state;
+  const { loading, errorMessage, error, attendanceData } = state;
 
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
+
     localDispatch({
-      type: SET_STUDENT_DATA,
+      type: SET_ATTENDANCE_DATA,
       payload: { name, value },
     });
   };
@@ -33,7 +34,7 @@ const CreateStudent = () => {
     e.preventDefault();
 
     localDispatch({ type: SET_LOADING, payload: true });
-    const errors = formInputValidation(studentData, "student");
+    const errors = attendanceValidation(attendanceData);
 
     if (errors.length > 0) {
       localDispatch({ type: SET_ERROR_MESSAGE, payload: errors });
@@ -41,21 +42,19 @@ const CreateStudent = () => {
       localDispatch({ type: SET_LOADING, payload: false });
     } else {
       try {
-        // create student using API
-        // console.log("student name :" + studentData.name);
+        // create attendance using API
+        // console.log("attendance status :" + attendanceData.status);
+
         localDispatch({ type: SET_LOADING, payload: false });
         localDispatch({ type: SET_ERROR, payload: false });
         localDispatch({ type: SET_ERROR_MESSAGE, payload: [] });
-
       } catch (error) {
-
         localDispatch({
           type: SET_ERROR_MESSAGE,
-          payload: ["Failed to create student"],
+          payload: ["Failed to create attendance"],
         });
         localDispatch({ type: SET_ERROR, payload: true });
         localDispatch({ type: SET_LOADING, payload: false });
-
       }
     }
   };
@@ -77,66 +76,57 @@ const CreateStudent = () => {
 
         <form
           onSubmit={handleSubmit}
-          className=" flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[70vh] mx-auto mt-[6%]"
+          className=" flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[60vh] mx-auto mt-[6%]"
         >
           <div className=" w-[45%]">
             <InputField
-              name={"name"}
+              name={"studentRollno"}
               handlechange={handleChange}
-              value={studentData.name}
+              value={attendanceData.studentRollno}
               error={error}
             />
             <InputField
-              name={"email"}
+              name={"staffName"}
               handlechange={handleChange}
-              value={studentData.email}
-              type={"email"}
+              value={attendanceData.staffName}
               error={error}
             />
             <InputField
-              name={"password"}
+              name={"date"}
               handlechange={handleChange}
-              value={studentData.password}
-              type={"password"}
+              value={attendanceData.date}
+              type={"date"}
               error={error}
             />
-            <InputField
-              name={"rollno"}
-              handlechange={handleChange}
-              value={studentData.rollno}
-              error={error}
-            />
-            <InputField
-              name={"year"}
-              handlechange={handleChange}
-              value={studentData.year}
-              error={error}
-            />
+            <select 
+            id="status"
+            name="status"
+            className="outline-none px-[5px] py-[8px] my-[2%] mt-[6%] cursor-pointer w-[100%] border border-gray-400"
+            value={attendanceData.status}
+            onChange={(e) => {
+              handleChange(e);
+            }}>
+              <option value="" disabled>
+                Status
+              </option>
+              <option value="present">Present</option>
+              <option value="absent">Absent</option>
+              <option value="od/permission">OD / Permission</option>
+            </select>
+
           </div>
 
           <div className=" w-[45%]">
             <InputField
-              name={"department"}
+              name={"semester"}
               handlechange={handleChange}
-              value={studentData.department}
+              value={attendanceData.semester}
               error={error}
             />
             <InputField
               name={"institute"}
               handlechange={handleChange}
-              value={studentData.institute}
-              error={error}
-            />
-            <InputField
-              name={"phoneNumber"}
-              handlechange={handleChange}
-              value={studentData.phoneNumber}
-              error={error}
-            />
-            <InputField
-              name={"parentNumber"}
-              handlechange={handleChange}
-              value={studentData.parentNumber}
+              value={attendanceData.institute}
               error={error}
             />
 
@@ -144,7 +134,7 @@ const CreateStudent = () => {
               type="submit"
               className="w-[100%] py-[3%] px-[2%] text-center border bg-[--primary-purpel] mt-[9%] text-white"
             >
-              Create Student
+              Create attendance
             </button>
           </div>
         </form>
@@ -153,4 +143,4 @@ const CreateStudent = () => {
   }
 };
 
-export default CreateStudent;
+export default CreateAttendance;

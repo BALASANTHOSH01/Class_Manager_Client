@@ -5,6 +5,7 @@ const API_KEY = import.meta.env.VITE_API_END_POINT; // API_KEY
 // create axios connection
 const axiosInstance = axios.create({
   baseURL: API_KEY,
+ 
   headers: {
     'Content-Type': 'application/json',
   },

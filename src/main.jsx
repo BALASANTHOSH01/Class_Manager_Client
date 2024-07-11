@@ -18,6 +18,9 @@ import StudentProfile from "./components/ManageStudent/StudentProfile.jsx";
 import StaffProfile from "./components/ManageStaff/StaffProfile.jsx";
 import AttendanceProfile from "./components/ManageAttendance/AttendanceProfile.jsx";
 import CreateStudent from "./components/ManageStudent/CreateStudent.jsx";
+import CreateStaff from "./components/ManageStaff/CreateStaff.jsx";
+import CreateAttendance from "./components/ManageAttendance/CreateAttendance.jsx";
+import Logout from "./pages/Dashboard/Logout.jsx";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +66,18 @@ const router = createBrowserRouter([
       {
         path: "/dashboard/create-student",
         element: <ProtectedRoute element={<CreateStudent />} />,
+      },
+      {
+        path: "/dashboard/create-staff",
+        element: <ProtectedRoute element={<CreateStaff />} />,
+      },
+      {
+        path: "/dashboard/create-attendance",
+        element: <ProtectedRoute element={<CreateAttendance />} />,
+      },
+      {
+        path: "/dashboard/logout",
+        element: <ProtectedRoute element={<Logout />} />,
       },
     ],
   },

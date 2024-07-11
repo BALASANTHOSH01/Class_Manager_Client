@@ -21,7 +21,7 @@ const userSlice = createSlice({
       state.currentUser = action.payload.userData;
       state.currentUserType = action.payload.userType;
     },
-    closeUser: (state) => {
+    logout: (state) => {
       state.currentUser = null;
       state.currentUserType = "";
       state.isAuthenticate = false;
@@ -36,6 +36,6 @@ export default userSlice.reducer;
 export const {
   setCurrentUser,
   updateCurrentUser,
-  closeUser,
+  logout,
   setIsAuthenticate,
 } = userSlice.actions;

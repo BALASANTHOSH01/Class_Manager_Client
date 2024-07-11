@@ -35,10 +35,13 @@ import {
   reducer,
   initialState,
 } from "../index.js";
+import { useNavigate } from "react-router-dom";
 
 
 const Register = () => {
   const dispatch = useDispatch();
+  
+  const navigate = useNavigate();
 
   // useReducer part
   const [state, localDispatch] = useReducer(reducer, initialState);
@@ -126,6 +129,11 @@ const Register = () => {
 
       dispatch(setCurrentUser({ userData: data, userType: userType }));
       dispatch(setIsAuthenticate({ isAuthenticate: true }));
+
+      
+      //redirect to dashboard
+      navigate("/dashboard");
+      
     } catch (error) {
       displayError([error.message]);
     } finally {
