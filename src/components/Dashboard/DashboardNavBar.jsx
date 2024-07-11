@@ -1,6 +1,7 @@
 import { IoSearchCircle as SearchIcon } from "react-icons/io5";
 import { IoNotificationsCircleOutline as NotificationIcon } from "react-icons/io5";
 import { IoPerson as UserIcon } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 const DashboardNavBar = ({ isSideNavHovered, setIsSideNavHovered }) => {
   return (
@@ -29,7 +30,10 @@ const DashboardNavBar = ({ isSideNavHovered, setIsSideNavHovered }) => {
       </div>
 
         <NotificationIcon className=" text-[28px] cursor-pointer rounded-[50%] "/>
+
+        <Link to={"/account-settings"}>
         <UserIcon className=" text-[30px] bg-white cursor-pointer p-1 rounded-[50%] hover:bg-gray-100"/>
+        </Link>
     
     </div>
   );

@@ -21,6 +21,7 @@ import CreateStudent from "./components/ManageStudent/CreateStudent.jsx";
 import CreateStaff from "./components/ManageStaff/CreateStaff.jsx";
 import CreateAttendance from "./components/ManageAttendance/CreateAttendance.jsx";
 import Logout from "./pages/Dashboard/Logout.jsx";
+import AccountSetting from "./components/AccountSetting/AccountSetting.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "/auth/register",
     element: <Register />,
+  },
+  {
+    path: "/account-settings",
+    element: <ProtectedRoute element={<AccountSetting />} />,
   },
   {
     path: "/dashboard",

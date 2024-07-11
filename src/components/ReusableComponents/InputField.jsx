@@ -1,6 +1,6 @@
-const InputField = ({ name, handlechange, value, type,error }) => {
+const InputField = ({ name, handlechange, value, type,error, divClass }) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${divClass}`}>
       <label htmlFor={name}>
         {name.charAt(0).toUpperCase() + name.slice(1)} :
       </label>

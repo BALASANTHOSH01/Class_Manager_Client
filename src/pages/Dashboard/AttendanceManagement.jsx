@@ -10,7 +10,7 @@ const AttendanceManagement = () => {
         <Button
           icon={<PlusIcon />}
           pageLink={"/dashboard/create-attendance"}
-          text={"Create Student"}
+          text={"Create Attendance"}
           className={
             "text-white bg-[--primary-purpel] w-[200px] absolute top-[5%] right-[5%]"
           }
