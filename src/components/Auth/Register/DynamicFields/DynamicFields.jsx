@@ -1,10 +1,15 @@
 import { InputField } from "../../../ReusableComponents";
 import { IoChevronBack as BackIcon } from "react-icons/io5";
 
-const DynamicFields = ({ userType, handleChange, formData, handleBackForm,error }) => {
+const DynamicFields = ({
+  userType,
+  handleChange,
+  formData,
+  handleBackForm,
+  error,
+}) => {
   return (
     <div className="w-[500px] flex flex-col gap-4 py-[2%] px-[2%] border mx-auto my-[8%]">
-
       {/**Back button */}
       <div
         className="absolute top-[5%] left-[10%] flex flex-row gap-2 items-center w-[100px] text-center justify-center font-semibold cursor-pointer px-[5px] py-[5px] bg-gray-300"
@@ -15,9 +20,8 @@ const DynamicFields = ({ userType, handleChange, formData, handleBackForm,error 
       </div>
 
       {/**Common filed for Student & Staff */}
-      {(userType === "student" || userType === "staff") && (
+      {userType === "staff" && (
         <div>
-
           {/**PhoneNumber */}
           <InputField
             name="phoneNumber"
@@ -26,21 +30,74 @@ const DynamicFields = ({ userType, handleChange, formData, handleBackForm,error 
             error={error}
           />
 
-           {/**Institute (college Name or id) */}
+          {/**Institute (college Name or id) */}
           <InputField
             name="institute"
             handlechange={handleChange}
             value={formData.institute}
             error={error}
           />
-
         </div>
       )}
+
+     
+      {/** Student's specific fields ( rollno, department, year, parentNumber )*/}
+      {userType === "student" && (
+        <div>
+          
+          {/** Student's rollno */}
+          <InputField
+            name="rollno"
+            handlechange={handleChange}
+            value={formData.rollno}
+            error={error}
+          />
+
+          {/**department */}
+          <InputField
+            name="department"
+            handlechange={handleChange}
+            value={formData.department}
+            error={error}
+          />
+
+          {/** Year*/}
+          <InputField
+            name="year"
+            handlechange={handleChange}
+            value={formData.year}
+            error={error}
+          />
+
+          {/** ParentNumber*/}
+          <InputField
+            name="parentNumber"
+            handlechange={handleChange}
+            value={formData.parentNumber}
+            error={error}
+          />
+          {/**PhoneNumber */}
+          <InputField
+            name="phoneNumber"
+            handlechange={handleChange}
+            value={formData.phoneNumber}
+            error={error}
+          />
+
+          {/**Institute (college Name or id) */}
+          <InputField
+            name="institute"
+            handlechange={handleChange}
+            value={formData.institute}
+            error={error}
+          />
+        </div>
+      )}
+
 
       {/** Institute's specific fields ( college_code, pincode )*/}
       {userType === "institute" && (
         <div>
-
           {/**College_code */}
           <InputField
             name="college_code"
@@ -56,7 +113,6 @@ const DynamicFields = ({ userType, handleChange, formData, handleBackForm,error 
             value={formData.pincode}
             error={error}
           />
-          
         </div>
       )}
 
@@ -67,7 +123,6 @@ const DynamicFields = ({ userType, handleChange, formData, handleBackForm,error 
       >
         Register
       </button>
-
     </div>
   );
 };

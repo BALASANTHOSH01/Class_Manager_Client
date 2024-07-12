@@ -58,6 +58,7 @@ const Register = () => {
     pincode: "",
     college_code: "",
     phoneNumber: "",
+    parentNumber: "",
     institute: "",
     rollno: "",
     department: "",

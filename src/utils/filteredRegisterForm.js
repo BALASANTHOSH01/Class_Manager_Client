@@ -3,9 +3,9 @@ const filteredRegisterForm = ({ data, userType }) => {
 
   if (userType === "student") {
 
-    const { name, email, password, phoneNumber, institute, rollno, year, department } = data;
+    const { name, email, password, phoneNumber,parentNumber, institute, rollno, year, department } = data;
     
-    Object.assign(filteredData, { name, email, password, phoneNumber, institute, rollno, year, department });
+    Object.assign(filteredData, { name, email, password, phoneNumber, parentNumber, institute, rollno, year, department });
 
   } else if (userType === "staff") {
 

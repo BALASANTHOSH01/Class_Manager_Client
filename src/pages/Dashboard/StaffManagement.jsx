@@ -10,7 +10,7 @@ const StaffManagement = () => {
         <Button
           icon={<PlusIcon />}
           pageLink={"/dashboard/create-staff"}
-          text={"Create Student"}
+          text={"Create Staff"}
           className={
             "text-white bg-[--primary-purpel] w-[200px] absolute top-[5%] right-[5%]"
           }
