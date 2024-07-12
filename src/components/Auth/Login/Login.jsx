@@ -29,6 +29,8 @@ import {
 
 import { displayError } from "../../../utils/displayError.js";
 
+import {setToken,getToken,removeToken} from "../../../utils/index.js";
+
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,13 +70,22 @@ const Login = () => {
         throw new Error("No response found.");
       }
 
+      console.log("user Id: "+response.data.instituteData._id);
+
+      // console.log("response token :"+response.data.token);
+      localStorage.setItem("authToken",response.data.token);
+
       // redux current user part
       await dispatch(
         setCurrentUser({
           userData: response.data.instituteData,
           userType: userType,
+          userId: response.data.instituteData._id
         })
       );
+
+      // set token
+      await setToken(response.data.token);
 
       // redux user authenticate
       dispatch(setIsAuthenticate({ isAuthenticate: true }));

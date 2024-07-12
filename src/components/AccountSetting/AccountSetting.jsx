@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { filteredRegisterForm } from "../../utils";
 import { FiEdit as EditIcon } from "react-icons/fi";
 import { updateCurrentUser } from "../../features/user/userSlice";
+import { updateInstitute } from "../../api/institute/institute.api";
 
 const AccountSetting = () => {
   // call dispatch
@@ -24,6 +25,9 @@ const AccountSetting = () => {
 
   // get existing user Data
   const existingUser = useSelector((state) => state.user.currentUser);
+
+  // get existing user's Id
+  const existingUserId = useSelector((state) => state.user.currentUserId);
 
   // get existsing user Type
   const existingUserType = useSelector((state) => state.user.currentUserType);
@@ -43,9 +47,8 @@ const AccountSetting = () => {
     data: currentUserDetails,
     userType: existingUserType,
   });
-  const { password, ...withOutPasswordData } = userNewData;
 
-  console.log("userNewData :" + userNewData);
+  const { password, ...withOutPasswordData } = userNewData;
 
   // set the Data becomes editable
   const handleIsEditable = () => {
@@ -54,7 +57,26 @@ const AccountSetting = () => {
   };
 
   // save the edited Data
-  const saveData = () => {
+  const saveData = async () => {
+
+    if(existingUserType === "institute"){
+
+      try {
+  
+        const response = await updateInstitute(withOutPasswordData,existingUserId);
+
+      if(!response){
+        console.log("Error updating institute.");
+        throw new Error;
+      }
+
+      } catch (error) {
+        console.log("Error :"+error.message);
+        throw new Error;
+      }
+
+    }
+
     // Dispatch the action to update user details
     dispatch(
       updateCurrentUser({
@@ -97,7 +119,7 @@ const AccountSetting = () => {
 
         {/** User details fields */}
         <div className="w-[90%] border-[2px] px-[2%] py-[2%] my-[1%] mx-auto">
-          
+
           {/** Common fields for all type of 'Users' */}
           <AccountSettingInputField
             name={"name"}

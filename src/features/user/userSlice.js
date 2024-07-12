@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   currentUser: null, 
   currentUserType: "",
+  currentUserId:"",
   isAuthenticate: false,
 };
 
@@ -15,6 +16,7 @@ const userSlice = createSlice({
   reducers: {
     setCurrentUser: (state, action) => {
       state.currentUser = action.payload.userData;
+      state.currentUserId = action.payload.userId;
       state.currentUserType = action.payload.userType;
     },
     updateCurrentUser: (state, action) => {

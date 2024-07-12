@@ -12,6 +12,7 @@ import { PopupMSG } from "../../ReusableComponents/index.js";
 import {
   filteredRegisterForm,
   formInputValidation,
+  setToken,
 } from "../../../utils/index.js";
 
 // redux part
@@ -130,6 +131,8 @@ const Register = () => {
       dispatch(setCurrentUser({ userData: data, userType: userType }));
       dispatch(setIsAuthenticate({ isAuthenticate: true }));
 
+      // set token
+      await setToken(response.data.token);
       
       //redirect to dashboard
       navigate("/dashboard");

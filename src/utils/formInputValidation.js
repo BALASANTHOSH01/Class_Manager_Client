@@ -10,7 +10,6 @@ const formInputValidation = (formData, userType) => {
     if (!formData.year) errors.push("Year is required");
     if (!formData.phoneNumber) errors.push("phoneNumber is required");
     if (!formData.parentNumber) errors.push("parentNumber is required");
-    if (!formData.institute) errors.push("Institute is required");
   } else if (userType === "staff") {
     if (!formData.name) errors.push("Name is required");
     if (!formData.email) errors.push("Email is required");

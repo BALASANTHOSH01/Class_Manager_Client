@@ -1,11 +1,12 @@
 import axios from "axios";
+import {refreshAccessToken} from "./refreshToken.js";
+import {jwtDecode} from "jwt-decode";
 
 const API_KEY = import.meta.env.VITE_API_END_POINT; // API_KEY
 
 // create axios connection
 const axiosInstance = axios.create({
   baseURL: API_KEY,
- 
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,24 +14,39 @@ const axiosInstance = axios.create({
 
 // Request interceptor
 axiosInstance.interceptors.request.use(
-  (config) => {
-    // You can modify the request configuration here if needed
+  async (config) => {
+    let token = localStorage.getItem("authToken");
+    if (token) {
+      const { exp } = jwtDecode(token);
+      if (Date.now() >= exp * 1000) {
+        // Token expired, attempt to refresh it
+        token = await refreshAccessToken();
+      }
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
-    // Handle request error here
     return Promise.reject(error);
   }
 );
 
+
 // Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    // Handle the response data here if needed
     return response;
   },
-  (error) => {
-    // Handle response error here
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const token = await refreshAccessToken();
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      return axiosInstance(originalRequest);
+    } else if(error.response){
+      return error.response
+    }
     return Promise.reject(error);
   }
 );
