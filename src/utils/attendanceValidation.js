@@ -1,6 +1,7 @@
 const attendanceValidation = (attendanceData) => {
   let errors = [];
 
+  
   if (!attendanceData.studentRollno) errors.push("Student Rollno is required.");
   if (!attendanceData.staffName) errors.push("StaffName is required.");
   if (!attendanceData.status) errors.push("Status is required.");

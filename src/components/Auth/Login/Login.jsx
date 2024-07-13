@@ -1,5 +1,5 @@
 import { useReducer, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 // reusable input component
@@ -11,6 +11,9 @@ import { loginUser } from "../../../api/auth/auth";
 // Loader component
 import { Loader } from "../../Loader/index.js";
 
+// common reducers
+import {commonInitialState,commonReducer} from "../../reducers/commonReducers.js"
+
 // redux part
 import {
   setCurrentUser,
@@ -19,23 +22,29 @@ import {
 
 // reducer part
 import {
-  SET_ERROR,
-  SET_ERROR_MESSAGE,
   SET_USER_TYPE,
-  SET_LOADING,
-  reducer,
-  initialState,
+  loginInitialState,
+  loginReducer
 } from "./loginReducers.js";
 
-import { displayError } from "../../../utils/displayError.js";
+import {handleError,handleLoading} from "../../../utils/index.js";
 
-import {setToken,getToken,removeToken} from "../../../utils/index.js";
+import {setToken} from "../../../utils/index.js";
 
 const Login = () => {
+  
+  // common actions => (error, errorMessage, loading)
+  const [commonState, commonDispatch] = useReducer(
+    commonReducer,
+    commonInitialState
+  );
+  const { loading, error, errorMessage } = commonState;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [state, localDispatch] = useReducer(reducer, initialState);
-  const { userType, error, errorMessage, loading } = state;
+
+  const [loginState, loginDispatch] = useReducer(loginReducer, loginInitialState);
+  const { userType} = loginState;
 
   // login form data
   const [loginData, setLoginData] = useState({
@@ -44,7 +53,7 @@ const Login = () => {
   });
 
   const handleUserType = (type) => {
-    localDispatch({ type: SET_USER_TYPE, payload: type });
+    loginDispatch({ type: SET_USER_TYPE, payload: type });
   };
 
   const handleChange = (e) => {
@@ -56,21 +65,20 @@ const Login = () => {
   };
 
   const closePopup = () => {
-    localDispatch({ type: SET_ERROR, payload: false });
+    //handle error
+    handleError({dispatchFuntion:commonDispatch,errorMessages:[],condition:false});
   };
 
   // handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      localDispatch({ type: SET_LOADING, payload: true });
+      handleLoading({dispatchFunction:commonDispatch,loadingCondition:true});
 
       const response = await loginUser(loginData, userType);
       if (!response) {
         throw new Error("No response found.");
       }
-
-      console.log("user Id: "+response.data.instituteData._id);
 
       // console.log("response token :"+response.data.token);
       localStorage.setItem("authToken",response.data.token);
@@ -92,14 +100,15 @@ const Login = () => {
 
       //redirect to dashboard
       navigate("/dashboard");
-      localDispatch({ type: SET_LOADING, payload: true });
+      handleLoading({dispatchFunction:commonDispatch,loadingCondition:true});
     } catch (error) {
-      displayError(localDispatch, error.message);
-      localDispatch({ type: SET_LOADING, payload: false });
-
-      console.log("Error message: " + error.message);
+      //handle error
+      handleError({dispatchFuntion:commonDispatch,errorMessages:error.message,condition:true});
+      // handle loading
+      handleLoading({dispatchFunction:commonDispatch,loadingCondition:false});
     } finally {
-      localDispatch({ type: SET_LOADING, payload: false });
+      // handle loading
+      handleLoading({dispatchFunction:commonDispatch,loadingCondition:false});
     }
   };
 

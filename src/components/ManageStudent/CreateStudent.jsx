@@ -1,28 +1,50 @@
 import { useReducer } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { InputField, PopupMSG } from "../ReusableComponents";
-import { formInputValidation } from "../../utils";
+
 import {
-  initialState,
-  reducer,
-  SET_ERROR,
-  SET_ERROR_MESSAGE,
-  SET_LOADING,
+  handleLoading,
+  handleError,
+  formInputValidation,
+  getInstituteId,
+} from "../../utils";
+
+import {
+  localInitialState,
+  localReducer,
   SET_STUDENT_DATA,
   RESET_STUDENT_DATA,
   SET_STUDENT_CREATED,
 } from "./studentReducers";
+
+import {
+  commonInitialState,
+  commonReducer,
+} from "../reducers/commonReducers.js";
+
 import { Loader } from "../Loader";
 import { createStudent } from "../../api/student/student.api.js";
-import { useSelector } from "react-redux";
+import useExistingUserData from "../../hooks/useExistingUserData.jsx";
+import StudentForm from "./StudentForm.jsx";
 
 const CreateStudent = () => {
 
-  const [state, localDispatch] = useReducer(reducer, initialState);
-  const { loading, errorMessage, error, studentData, studentCreated } = state;
-  const existingUserType = useSelector((state) => state.user.currentUserType);
-  const existingUser = useSelector((state) => state.user.currentUser);
+  // existing user's Data & Type
+  const { existingUser, existingUserType } =
+    useExistingUserData();
 
+  // common actions => (error, errorMessage, loading)
+  const [commonState, commonDispatch] = useReducer(
+    commonReducer,
+    commonInitialState
+  );
+  const { loading, error, errorMessage } = commonState;
+
+  // Student Data
+  const [studentState, localDispatch] = useReducer(localReducer, localInitialState);
+  const { studentData, studentCreated } = studentState;
+
+  // handle values
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -32,54 +54,79 @@ const CreateStudent = () => {
     });
   };
 
-  // console.log("existingUser ID : "+existingUser._id);
+  // get user's Institute ID
+  const instituteId = getInstituteId(existingUserType, existingUser);
 
-  function getInstituteId() {
-    if (existingUserType === "institute") {
-      return existingUser._id;
-    } else if (existingUserType === "staff") {
-      return existingUser.institute;
-    }
-    return ""; // Ensure to return a default value if no condition matches
-  }
-
-  const instituteId = getInstituteId();
-  // console.log("institute is got it :"+ instituteId);
-
+  // close the popup error message
   const closePopup = () => {
-    localDispatch({ type: SET_ERROR, payload: false });
+    handleError({
+      dispatchFuntion: commonDispatch,
+      errorMessages: [],
+      condition: false,
+    });
   };
 
+  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    localDispatch({ type: SET_LOADING, payload: true });
-    const errors = formInputValidation(studentData, "student");
+    // handle Laoding
+    handleLoading({ dispatchFunction: commonDispatch, loadingCondition: true });
 
-    if (errors.length > 0) {
-      localDispatch({ type: SET_ERROR_MESSAGE, payload: errors });
-      localDispatch({ type: SET_ERROR, payload: true });
-      localDispatch({ type: SET_LOADING, payload: false });
+    // find unfilled data point and give error
+    const formErrorMessage = formInputValidation(studentData, "student");
+
+    if (formErrorMessage.length > 0) {
+      // handles the form error & errorMessage
+      handleError({
+        dispatchFuntion: commonDispatch,
+        errorMessages: formErrorMessage,
+        condition: true,
+      });
     } else {
       try {
-        // Ensure instituteId is included in studentData
-        const studentDataWithInstitute = { ...studentData, institute: instituteId };
 
+        // Adding InstituteID with form data
+        const studentDataWithInstitute = {
+          ...studentData,
+          institute: instituteId,
+        };
+
+        // create Student
         await createStudent(studentDataWithInstitute, existingUserType);
-        localDispatch({ type: SET_LOADING, payload: false });
-        localDispatch({ type: SET_ERROR, payload: false });
-        localDispatch({ type: SET_ERROR_MESSAGE, payload: [] });
-        localDispatch({ type: SET_STUDENT_CREATED, payload: true });
+
+        // handle Laoding
+        handleLoading({
+          dispatchFunction: commonDispatch,
+          loadingCondition: false,
+        });
+
+        // handles the form error & errorMessage
+        handleError({
+          dispatchFuntion: commonDispatch,
+          errorMessages: [],
+          condition: false,
+        });
+
+        // set student created
+        localDispatch({ type: SET_STUDENT_CREATED,payload:true });
+
         // Optionally reset student data
         localDispatch({ type: RESET_STUDENT_DATA });
+
       } catch (error) {
-        console.log("error msg : " + error.message);
-        localDispatch({
-          type: SET_ERROR_MESSAGE,
-          payload: ["Failed to create student"],
+        // handles the form error & errorMessage
+        handleError({
+          dispatchFuntion: commonDispatch,
+          errorMessages: ["Failed to create student"],
+          condition: true,
         });
-        localDispatch({ type: SET_ERROR, payload: true });
-        localDispatch({ type: SET_LOADING, payload: false });
+
+        // handle Laoding
+        handleLoading({
+          dispatchFunction: commonDispatch,
+          loadingCondition: false,
+        });
       }
     }
   };
@@ -99,78 +146,19 @@ const CreateStudent = () => {
           />
         )}
 
+        {/** student creation form */}
         {studentCreated ? (
           <div className=" text-[50px] text-green-500 mx-auto mt-[20%]">
             <CheckCircleIcon />
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className=" flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[70vh] mx-auto mt-[6%]"
-          >
-            <div className=" w-[45%]">
-              <InputField
-                name={"name"}
-                handlechange={handleChange}
-                value={studentData.name}
-                error={error}
-              />
-              <InputField
-                name={"email"}
-                handlechange={handleChange}
-                value={studentData.email}
-                type={"email"}
-                error={error}
-              />
-              <InputField
-                name={"password"}
-                handlechange={handleChange}
-                value={studentData.password}
-                type={"password"}
-                error={error}
-              />
-              <InputField
-                name={"rollno"}
-                handlechange={handleChange}
-                value={studentData.rollno}
-                error={error}
-              />
-              <InputField
-                name={"year"}
-                handlechange={handleChange}
-                value={studentData.year}
-                error={error}
-              />
-            </div>
-
-            <div className=" w-[45%]">
-              <InputField
-                name={"department"}
-                handlechange={handleChange}
-                value={studentData.department}
-                error={error}
-              />
-              <InputField
-                name={"phoneNumber"}
-                handlechange={handleChange}
-                value={studentData.phoneNumber}
-                error={error}
-              />
-              <InputField
-                name={"parentNumber"}
-                handlechange={handleChange}
-                value={studentData.parentNumber}
-                error={error}
-              />
-
-              <button
-                type="submit"
-                className="w-[100%] py-[3%] px-[2%] text-center border bg-[--primary-purpel] mt-[9%] text-white"
-              >
-                Create Student
-              </button>
-            </div>
-          </form>
+          <StudentForm
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            error={error}
+            studentData={studentData}
+            InputField={InputField}
+          />
         )}
       </>
     );

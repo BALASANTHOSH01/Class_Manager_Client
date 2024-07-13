@@ -1,6 +1,6 @@
 import axiosInstance from "../../axios/axiosInstance";
 
-export const createStudent = async (data, userType) => {
+const createStudent = async (data, userType) => {
   try {
     if (userType === "institute" || userType === "staff") {
       const response = await axiosInstance.post(
@@ -12,7 +12,7 @@ export const createStudent = async (data, userType) => {
         return "Can't create student.";
       }
 
-      console.log("response gotted :"+response);
+      console.log("response gotted :" + response);
 
       return response.data;
     }
@@ -21,3 +21,20 @@ export const createStudent = async (data, userType) => {
     throw error;
   }
 };
+
+// find studentID by using Rollno
+const findStudentIDByRollno = async (studentRollno,instituteId) => {
+  try {
+    const response = await axiosInstance.get(`/api/students/${instituteId}/${studentRollno}`);
+
+    if (!response) {
+      return "No student found in this rollno.";
+    }
+    return response.data._id;
+  } catch {
+    console.log("Error getting student.");
+    throw new Error();
+  }
+};
+
+export {createStudent,findStudentIDByRollno};

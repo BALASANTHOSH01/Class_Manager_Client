@@ -33,11 +33,25 @@ const getInstitute = async (collegeCode) => {
       throw new Error("Institute not found");
     }
 
-    return response.data; // Return the response data
+    return response.data; // Return the Institute data
   } catch (error) {
     console.error("Error getting institute:", error);
     throw error;
   }
 };
 
-export { updateInstitute, getInstitute };
+// find instituteID by Name
+const findInstituteIDByName= async(instituteName) =>{
+  try {
+    const response = await axiosInstance.get(`/api/institute/${instituteName}`);
+    if(!response){
+      return "No institute found.";
+    }
+    return response.data._id; // return institute ID
+  } catch (error) {
+    console.error("Error getting institute:", error);
+    throw error;
+  }
+}
+
+export { updateInstitute, getInstitute,findInstituteIDByName };
