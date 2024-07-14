@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { DashboardNavBar,DashboardSideBar } from '../../components/Dashboard';
 import { Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import useTokenAutoRefresh from '../../hooks/useTokenAutoRefresh';
 
 const Dashboard = () => {
-  
+  useTokenAutoRefresh()
   const [isSideNavHovered,setIsSideNavHovered]=useState(false);
   return (
     <div>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {refreshAccessToken} from "./refreshToken.js";
+import { refreshAccessToken } from "../api/api";
 import {jwtDecode} from "jwt-decode";
 
 const API_KEY = import.meta.env.VITE_API_END_POINT; // API_KEY

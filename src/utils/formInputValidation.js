@@ -16,6 +16,7 @@ const formInputValidation = (formData, userType) => {
     if (!formData.password) errors.push("Password ");
     if (!formData.phoneNumber) errors.push("PhoneNumber ");
     if (!formData.department) errors.push("Department ");
+    if (!formData.institute) errors.push("Institute ");
     
   } else if (userType === "institute") {
     if (!formData.name) errors.push("Name ");
@@ -27,9 +28,11 @@ const formInputValidation = (formData, userType) => {
 
   if(errors.length > 1){
     errors = errors.join(", ");
+    return errors+"is required";
+  } else {
+    return errors
   }
 
-  return errors+"is required";
 };
 
 export default formInputValidation;

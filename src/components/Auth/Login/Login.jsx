@@ -12,7 +12,10 @@ import { loginUser } from "../../../api/auth/auth";
 import { Loader } from "../../Loader/index.js";
 
 // common reducers
-import {commonInitialState,commonReducer} from "../../reducers/commonReducers.js"
+import {
+  commonInitialState,
+  commonReducer,
+} from "../../reducers/commonReducers.js";
 
 // redux part
 import {
@@ -24,15 +27,14 @@ import {
 import {
   SET_USER_TYPE,
   loginInitialState,
-  loginReducer
+  loginReducer,
 } from "./loginReducers.js";
 
-import {handleError,handleLoading} from "../../../utils/index.js";
+import { handleError, handleLoading } from "../../../utils/index.js";
 
-import {setToken} from "../../../utils/index.js";
+import { setToken } from "../../../utils/index.js";
 
 const Login = () => {
-  
   // common actions => (error, errorMessage, loading)
   const [commonState, commonDispatch] = useReducer(
     commonReducer,
@@ -43,8 +45,11 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [loginState, loginDispatch] = useReducer(loginReducer, loginInitialState);
-  const { userType} = loginState;
+  const [loginState, loginDispatch] = useReducer(
+    loginReducer,
+    loginInitialState
+  );
+  const { userType } = loginState;
 
   // login form data
   const [loginData, setLoginData] = useState({
@@ -66,14 +71,14 @@ const Login = () => {
 
   const closePopup = () => {
     //handle error
-    handleError({dispatchFuntion:commonDispatch,errorMessages:[],condition:false});
+    handleError(commonDispatch, [], false);
   };
 
   // handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      handleLoading({dispatchFunction:commonDispatch,loadingCondition:true});
+      handleLoading(commonDispatch, true);
 
       const response = await loginUser(loginData, userType);
       if (!response) {
@@ -81,14 +86,14 @@ const Login = () => {
       }
 
       // console.log("response token :"+response.data.token);
-      localStorage.setItem("authToken",response.data.token);
+      localStorage.setItem("authToken", response.data.token);
 
       // redux current user part
       await dispatch(
         setCurrentUser({
           userData: response.data.instituteData,
           userType: userType,
-          userId: response.data.instituteData._id
+          userId: response.data.instituteData._id,
         })
       );
 
@@ -100,15 +105,15 @@ const Login = () => {
 
       //redirect to dashboard
       navigate("/dashboard");
-      handleLoading({dispatchFunction:commonDispatch,loadingCondition:true});
+      handleLoading(commonDispatch, true);
     } catch (error) {
       //handle error
-      handleError({dispatchFuntion:commonDispatch,errorMessages:error.message,condition:true});
+      handleError(commonDispatch, error.message, true);
       // handle loading
-      handleLoading({dispatchFunction:commonDispatch,loadingCondition:false});
+      handleLoading(commonDispatch, false);
     } finally {
       // handle loading
-      handleLoading({dispatchFunction:commonDispatch,loadingCondition:false});
+      handleLoading(commonDispatch, false);
     }
   };
 
@@ -126,7 +131,11 @@ const Login = () => {
         {error && (
           <PopupMSG
             color={"bg-red-500"}
-            errors={errorMessage.length > 0 ? "Something went wrong" : ["Invalid Credentials"]}
+            errors={
+              errorMessage.length > 0
+                ? "Something went wrong"
+                : ["Invalid Credentials"]
+            }
             closePopup={closePopup}
           />
         )}

@@ -2,7 +2,7 @@
 import { SET_ERROR, SET_ERROR_MESSAGE } from "../components/reducers/commonReducers";
 
 // handleError.js
-export const handleError = ({ dispatchFunction, errorMessages, condition }) => {
+export const handleError = ( dispatchFunction, errorMessages, condition ) => {
   if (typeof dispatchFunction === 'function') {
     dispatchFunction({
       type: SET_ERROR,

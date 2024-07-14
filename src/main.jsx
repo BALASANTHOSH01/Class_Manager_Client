@@ -22,6 +22,7 @@ import CreateStaff from "./components/ManageStaff/CreateStaff.jsx";
 import CreateAttendance from "./components/ManageAttendance/CreateAttendance.jsx";
 import Logout from "./pages/Dashboard/Logout.jsx";
 import AccountSetting from "./components/AccountSetting/AccountSetting.jsx";
+import useTokenAutoRefresh from "./hooks/useTokenAutoRefresh.jsx";
 
 const router = createBrowserRouter([
   {

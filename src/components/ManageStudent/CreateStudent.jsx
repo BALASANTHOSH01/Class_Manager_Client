@@ -51,48 +51,34 @@ const CreateStudent = () => {
   };
 
   const closePopup = () => {
-    handleError({
-      dispatchFunction: commonDispatch,
-      errorMessages: [],
-      condition: false,
-    });
+    handleError(commonDispatch, [], false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    handleLoading({ dispatchFunction: commonDispatch, loadingCondition: true });
+    handleLoading(commonDispatch, true);
     const errors = formInputValidation(studentData, "student");
 
-
     if (errors.length > 0) {
-      handleError({
-        dispatchFunction: commonDispatch,
-        errorMessages: errors,
-        condition: true,
-      });
-      handleLoading({ dispatchFunction: commonDispatch, loadingCondition: false });
+      handleError(commonDispatch, errors, true);
+      handleLoading(commonDispatch, false);
       return;
     }
 
     try {
-      const studentDataWithInstitute = { ...studentData, institute: instituteId };
+      const studentDataWithInstitute = {
+        ...studentData,
+        institute: instituteId,
+      };
       await createStudent(studentDataWithInstitute, existingUserType);
-      handleLoading({ dispatchFunction: commonDispatch, loadingCondition: false });
-      handleError({
-        dispatchFunction: commonDispatch,
-        errorMessages: [],
-        condition: false,
-      });
+      handleLoading(commonDispatch, false);
+      handleError(commonDispatch, [], false);
       localDispatch({ type: SET_STUDENT_CREATED, payload: true });
       localDispatch({ type: RESET_STUDENT_DATA });
     } catch (error) {
-      handleError({
-        dispatchFunction: commonDispatch,
-        errorMessages: ["Failed to create student"],
-        condition: true,
-      });
-      handleLoading({ dispatchFunction: commonDispatch, loadingCondition: false });
+      handleError(commonDispatch, ["Failed to create student"], true);
+      handleLoading(commonDispatch, false);
     }
   };
 
@@ -104,7 +90,9 @@ const CreateStudent = () => {
         {error && (
           <PopupMSG
             color={"bg-red-500"}
-            errors={errorMessage.length > 0 ? errorMessage : "Invalid Credentials"}
+            errors={
+              errorMessage.length > 0 ? errorMessage : "Invalid Credentials"
+            }
             closePopup={closePopup}
           />
         )}
