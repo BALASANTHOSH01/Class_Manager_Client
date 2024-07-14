@@ -7,8 +7,8 @@ import {
   handleLoading,
 } from "../../utils";
 import {
-staffInitialState,
-staffReducer,
+  staffInitialState,
+  staffReducer,
   SET_STAFF_DATA,
   SET_INSTITUTE_ID,
   SET_STAFF_CREATED,
@@ -21,25 +21,26 @@ import { commonInitialState, commonReducer } from "../reducers/commonReducers";
 import useExistingUserData from "../../hooks/useExistingUserData";
 
 const CreateStaff = () => {
-  // existing user's Data & Type
-  const { existingUser, existingUserType } = useExistingUserData();
 
-  // common actions => (error, errorMessage, loading)
+  // existing user's Data & Type
+  const { existingUser, existingUserType } =
+    useExistingUserData();
+
+  // common actions => ( error, errorMessage, loading )
   const [commonState, commonDispatch] = useReducer(
     commonReducer,
     commonInitialState
   );
   const { loading, error, errorMessage } = commonState;
 
-  const [staffState, staffDispatch] = useReducer(staffInitialState, staffInitialState);
+
+  const [staffState, staffDispatch] = useReducer(staffReducer, staffInitialState);
   const { staffData, staffCreated } = staffState;
 
   const instituteId = getInstituteId(existingUserType, existingUser);
 
   const handleChange = (e) => {
-    e.preventDefault();
     const { name, value } = e.target;
-
     staffDispatch({
       type: SET_STAFF_DATA,
       payload: { name, value },
@@ -57,8 +58,10 @@ const CreateStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Set institute ID before validation
     staffDispatch({ type: SET_INSTITUTE_ID, payload: instituteId });
-    handleLoading({ dispatchFunction: commonDispatch, loadingCondition: true });
+
+    // Validate form data
     const formErrorMessages = formInputValidation(staffData, "staff");
 
     if (formErrorMessages.length > 0) {
@@ -67,59 +70,62 @@ const CreateStaff = () => {
         errorMessages: formErrorMessages,
         condition: true,
       });
+      handleLoading({ dispatchFunction: commonDispatch, loadingCondition: false });
+      return; // Early exit if validation fails
+    }
 
-      staffDispatch({ type: SET_LOADING, payload: false });
-    } else {
-      try {
-        // create staff using API
+    handleLoading({ dispatchFunction: commonDispatch, loadingCondition: true });
 
-        await createStaff(staffData, existingUserType);
-        staffDispatch({ type: SET_LOADING, payload: false });
-        staffDispatch({ type: SET_ERROR, payload: false });
-        staffDispatch({ type: SET_ERROR_MESSAGE, payload: [] });
-        staffDispatch({ type: SET_STAFF_CREATED, payload: true });
-      } catch (error) {
-        staffDispatch({
-          type: SET_ERROR_MESSAGE,
-          payload: ["Failed to create staff"],
-        });
-        staffDispatch({ type: SET_ERROR, payload: true });
-        staffDispatch({ type: SET_LOADING, payload: false });
-      }
+    try {
+      // Create staff using API
+      await createStaff(staffData, existingUserType);
+
+      staffDispatch({ type: SET_STAFF_CREATED, payload: true });
+      handleError({
+        dispatchFuntion: commonDispatch,
+        errorMessages: [],
+        condition: false,
+      });
+    } catch (error) {
+      handleError({
+        dispatchFuntion: commonDispatch,
+        errorMessages: ["Failed to create staff"],
+        condition: true,
+      });
+    } finally {
+      handleLoading({ dispatchFunction: commonDispatch, loadingCondition: false });
     }
   };
 
   if (loading) {
     return <Loader />;
-  } else {
-    return (
-      <>
-        {error && (
-          <PopupMSG
-            color={"bg-red-500"}
-            errors={
-              errorMessage.length > 0 ? errorMessage : "Invalid Credentials"
-            }
-            closePopup={closePopup}
-          />
-        )}
-
-        {staffCreated ? (
-          <div className=" text-[50px] text-green-500 mx-auto mt-[20%]">
-            <CheckCircleIcon />
-          </div>
-        ) : (
-          <StaffForm
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            staffData={staffData}
-            error={error}
-            InputField={InputField}
-          />
-        )}
-      </>
-    );
   }
+
+  return (
+    <>
+      {error && (
+        <PopupMSG
+          color="bg-red-500"
+          errors={errorMessage.length > 0 ? errorMessage : "Invalid Credentials"}
+          closePopup={closePopup}
+        />
+      )}
+
+      {staffCreated ? (
+        <div className="text-[50px] text-green-500 mx-auto mt-[20%]">
+          <CheckCircleIcon />
+        </div>
+      ) : (
+        <StaffForm
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          staffData={staffData}
+          error={error}
+          InputField={InputField}
+        />
+      )}
+    </>
+  );
 };
 
 export default CreateStaff;

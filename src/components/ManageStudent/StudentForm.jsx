@@ -2,7 +2,7 @@
 
 const StudentForm = ({handleChange,handleSubmit,error,studentData,InputField}) => {
   return (
-    <div>
+    <div className="mx-auto">
         <form
             onSubmit={handleSubmit}
             className=" flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[70vh] mx-auto mt-[6%]"

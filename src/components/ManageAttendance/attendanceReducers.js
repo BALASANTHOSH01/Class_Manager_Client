@@ -1,37 +1,31 @@
-export const initialState = {
+// attendanceReducers.js
+export const attendanceInitialState = {
   attendanceData: {
-    student_id:"",
-    staff_id:"",
-    staffName: "",
-    studentRollno: "",
-    status: "",
-    date: "",
+    student_id: "",
+    rollno: "",
     semester: "",
     institute: "",
+    staff_id: "",
+    date: "",
+    status: "",
   },
-  loading: false,
-  error: false,
-  errorMessage: [],
+  staffName: "",
+  students: [],
   staffs: [],
-  students: []
 };
 
 export const SET_ATTENDANCE_DATA = "SET_ATTENDANCE_DATA";
-export const SET_ERROR = "SET_ERROR";
-export const SET_ERROR_MESSAGE = "SET_ERROR_MESSAGE";
-export const SET_LOADING = "SET_LOADING";
-
-export const SET_STAFF_ID = "SET_STAFF_ID";
-export const SET_STAFFS = "SET_STAFFS";
-export const SET_STAFF_NAME = "SET_STAFF_NAME";
-
 export const SET_STUDENT_ID = "SET_STUDENT_ID";
-export const SET_STUDENTS = "SET_STUDENTS";
 export const SET_STUDENT_ROLLNO = "SET_STUDENT_ROLLNO";
+export const SET_STAFF_ID = "SET_STAFF_ID";
+export const SET_STAFF_NAME = "SET_STAFF_NAME";
+export const SET_STUDENTS = "SET_STUDENTS";
+export const SET_STAFFS = "SET_STAFFS";
+export const SET_INSTITUTE_ID = "SET_INSTITUTE_ID";
 
-export const reducer = (state, action) => {
+export const attendanceReducer = (state, action) => {
   switch (action.type) {
-    case SET_ATTENDANCE_DATA: // ATTENDANCE DATA
+    case SET_ATTENDANCE_DATA:
       return {
         ...state,
         attendanceData: {
@@ -39,51 +33,54 @@ export const reducer = (state, action) => {
           [action.payload.name]: action.payload.value,
         },
       };
-    case SET_LOADING: // LOADING
-      return { ...state, loading: action.payload };
-    case SET_ERROR: // ERROR
-      return { ...state, error: action.payload };
-    case SET_STUDENT_ID: // STUDENT LIST
-      return { ...state, attendanceData: {
-        ...state.attendanceData,
-        student_id:action.payload
-      } };
-    case SET_STUDENTS: // STUDENT LIST
-      return { ...state, students: action.payload };
-    case SET_STUDENT_ROLLNO: // STUDENT ROLLNO
+    case SET_STUDENT_ID:
       return {
         ...state,
         attendanceData: {
           ...state.attendanceData,
-          studentRollno: action.payload
-        }
+          student_id: action.payload,
+        },
       };
-    case SET_STAFFS: // STAFF LIST
-      return { ...state, staffs: action.payload };
-    case SET_STAFF_ID: // STAFF ID
-      return { ...state, attendanceData: {
-        ...state.attendanceData,
-        staff_id: action.payload
-      }};
-    case SET_STAFF_NAME: // STAFF NAME
+    case SET_STAFF_ID:
       return {
         ...state,
         attendanceData: {
           ...state.attendanceData,
-          staffName: action.payload
-        }
+          staff_id: action.payload,
+        },
       };
-    case SET_ERROR_MESSAGE: // ERROR MESSAGE
-      return { ...state, errorMessage: action.payload };
+    case SET_STUDENT_ROLLNO:
+      return {
+        ...state,
+        attendanceData: {
+          ...state.attendanceData,
+          rollno: action.payload,
+        },
+      };
+    case SET_STAFF_NAME:
+      return {
+        ...state,
+        staffName: action.payload,
+      };
+    case SET_STUDENTS:
+      return {
+        ...state,
+        students: action.payload,
+      };
+    case SET_STAFFS:
+      return {
+        ...state,
+        staffs: action.payload,
+      };
+    case SET_INSTITUTE_ID:
+      return {
+        ...state,
+        attendanceData: {
+          ...state.attendanceData,
+          institute: action.payload,
+        },
+      };
     default:
       return state;
   }
 };
-
-
-
-
-
-
-
-

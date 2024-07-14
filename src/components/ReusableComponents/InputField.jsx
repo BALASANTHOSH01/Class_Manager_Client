@@ -1,4 +1,4 @@
-const InputField = ({ name, handlechange, value, type,error, divClass }) => {
+const InputField = ({ name, handlechange, value, type, error, divClass }) => {
   return (
     <div className={`flex flex-col gap-1 ${divClass}`}>
       <label htmlFor={name}>

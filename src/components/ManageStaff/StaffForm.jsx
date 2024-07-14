@@ -2,7 +2,7 @@ import React from 'react'
 
 const StaffForm = ({handleChange,handleSubmit,staffData,error,InputField}) => {
   return (
-    <div>
+    <div className=' mx-auto'>
          <form
             onSubmit={handleSubmit}
             className=" flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[50vh] mx-auto mt-[6%]"

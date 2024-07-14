@@ -28,11 +28,13 @@ const PopupMSG = ({ color, errors, closePopup }) => {
   };
 
   return (
-    <div className={`flex flex-col items-center ${multipleErrors ? '' : 'flex-row gap-4'} w-[300px] text-white ${color} absolute top-[10%] left-[40%] justify-center py-[5px] px-[3px]`}>
+    <div className={`flex flex-col items-center ${multipleErrors ? '' : 'flex-row gap-4'} w-[600px] text-white ${color} absolute top-[10%] left-[27%] justify-center py-[5px] px-[5px]`}>
       <div className="bg-white text-red-500 cursor-pointer absolute left-0 h-full flex flex-col justify-center items-center p-1 text-[24px] border border-red-500 font-bold ">
         <CrossIcon onClick={closePopup} />
       </div>
+      <div className="ml-[10%]">
       {renderErrorMessages(errors)}
+      </div>
     </div>
   );
 };

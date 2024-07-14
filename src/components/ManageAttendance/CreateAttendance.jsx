@@ -1,241 +1,283 @@
-import { useEffect, useReducer } from "react";
+import React, { useReducer, useCallback } from "react";
 import { InputField, PopupMSG } from "../ReusableComponents";
-import { formInputValidation } from "../../utils";
 import {
-  initialState,
-  reducer,
+  attendanceInitialState,
+  attendanceReducer,
+  SET_ATTENDANCE_DATA,
+  SET_STUDENTS,
+  SET_STUDENT_ROLLNO,
+  SET_STAFFS,
+  SET_STAFF_NAME,
+  SET_INSTITUTE_ID,
+  SET_STUDENT_ID,
+  SET_STAFF_ID,
+} from "./attendanceReducers";
+
+import {
+  commonInitialState,
+  commonReducer,
   SET_ERROR,
   SET_ERROR_MESSAGE,
   SET_LOADING,
-  SET_ATTENDANCE_DATA,
-  SET_STUDENTS,
-  SET_STAFFS,
-  SET_STAFF_NAME,
-  SET_STUDENT_ROLLNO,
-  SET_STUDENT_ID,
-  SET_STAFF_ID
-} from "./attendanceReducers";
+} from "../reducers/commonReducers";
+
 import { Loader } from "../Loader";
 import { attendanceValidation } from "../../utils";
 import { searchStaff, searchStudent, takeOneAttendance } from "../../api";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
+import useExistingUserData from "../../hooks/useExistingUserData";
 
 const CreateAttendance = () => {
-  const [state, localDispatch] = useReducer(reducer, initialState);
-  const { loading, errorMessage, error, attendanceData, staffs, students } =
-    state;
-  const existingUserType = useSelector((state) => state.user.currentUserType);
-  const existingUser = useSelector((state) => state.user.currentUser);
+  const [attendanceState, attendanceDispatch] = useReducer(
+    attendanceReducer,
+    attendanceInitialState
+  );
 
-  function getInstituteId() {
-    if (existingUserType === "institute") {
-      return existingUser._id;
-    } else if (existingUserType === "staff") {
-      return existingUser.institute;
+  const [commonState, commonDispatch] = useReducer(
+    commonReducer,
+    commonInitialState
+  );
+
+  const { loading, error, errorMessage } = commonState;
+
+  const { existingUser, existingUserType } = useExistingUserData();
+
+  const getInstituteId = (userType, user) => {
+    if (userType === 'institute') {
+      return user._id;
+    } else if (userType === 'staff') {
+      return user.institute;
     }
-    return ""; // Ensure to return a default value if no condition matches
-  }
+    return '';
+  };
 
-  const InstituteId = getInstituteId();
+  const InstituteId = getInstituteId(existingUserType, existingUser);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    localDispatch({
+    attendanceDispatch({
       type: SET_ATTENDANCE_DATA,
       payload: { name, value },
     });
-
-    if (name === "studentRollno") {
-      debouncedSearchStudent(value);
-    } else if (name === "staffName") {
-      debouncedSearchStaff(value);
-    }
   };
 
-  // Staff Searching functionality with debounce
-  const debouncedSearchStaff = debounce(async (staffName) => {
-    if (staffName) {
-      try {
-        const staffList = await searchStaff(staffName);
-        localDispatch({ type: SET_STAFFS, payload: staffList });
-      } catch (error) {
-        console.error("Error fetching staff list:", error);
+  const debouncedSearchStaff = useCallback(
+    debounce(async (staffName) => {
+      if (staffName) {
+        try {
+          const staffList = await searchStaff(staffName, InstituteId);
+          attendanceDispatch({ type: SET_STAFFS, payload: staffList });
+        } catch (error) {
+          console.error("Error fetching staff list:", error);
+          commonDispatch({
+            type: SET_ERROR,
+            payload: true,
+          });
+          commonDispatch({
+            type: SET_ERROR_MESSAGE,
+            payload: "Error fetching staff list.",
+          });
+        }
+      } else {
+        attendanceDispatch({ type: SET_STAFFS, payload: [] });
       }
-    }
-  }, 300);
+    }, 300),
+    [InstituteId]
+  );
 
-  // Student Searching functionality with debounce
-  const debouncedSearchStudent = debounce(async (studentRollno) => {
-    if (studentRollno) {
-      try {
-        const studentList = await searchStudent(studentRollno);
-        localDispatch({ type: SET_STUDENTS, payload: studentList });
-      } catch (error) {
-        console.error("Error fetching student list:", error);
+  const debouncedSearchStudent = useCallback(
+    debounce(async (studentRollno) => {
+      if (studentRollno) {
+        try {
+          const studentList = await searchStudent(studentRollno, InstituteId);
+          attendanceDispatch({ type: SET_STUDENTS, payload: studentList });
+        } catch (error) {
+          console.error("Error fetching student list:", error);
+          commonDispatch({
+            type: SET_ERROR,
+            payload: true,
+          });
+          commonDispatch({
+            type: SET_ERROR_MESSAGE,
+            payload: "Error fetching student list.",
+          });
+        }
+      } else {
+        attendanceDispatch({ type: SET_STUDENTS, payload: [] });
       }
-    }
-  }, 300);
+    }, 300),
+    [InstituteId]
+  );
 
-  const closePopup = () => {
-    localDispatch({ type: SET_ERROR, payload: false });
+  const handleStudentRollno = (e) => {
+    const { value } = e.target;
+    handleChange(e);
+    debouncedSearchStudent(value);
   };
 
-  
-
-  const handleStaffSelect = (staffName) => {
-    localDispatch({ type: SET_STAFF_NAME, payload: staffName });
-    localDispatch({ type: SET_STAFFS, payload: [] });
+  const handleStaffName = (e) => {
+    const { value } = e.target;
+    handleChange(e);
+    debouncedSearchStaff(value);
   };
 
-  const handleStudentSelect = (studentRollno) => {
-    localDispatch({ type: SET_STUDENT_ROLLNO, payload: studentRollno });
-    localDispatch({ type: SET_STUDENTS, payload: [] });
+  const handleStudentSelect = (rollno, studentId) => {
+    attendanceDispatch({ type: SET_STUDENT_ID, payload: studentId });
+    attendanceDispatch({ type: SET_STUDENT_ROLLNO, payload: rollno });
+    attendanceDispatch({ type: SET_STUDENTS, payload: [] });
+  };
+
+  const handleStaffSelect = (staffName, staffId) => {
+    attendanceDispatch({ type: SET_STAFF_ID, payload: staffId });
+    attendanceDispatch({ type: SET_STAFF_NAME, payload: staffName });
+    attendanceDispatch({ type: SET_STAFFS, payload: [] });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const allAttendanceData = { ...attendanceData, institute: InstituteId };
+    attendanceDispatch({ type: SET_INSTITUTE_ID, payload: InstituteId });
 
-    localDispatch({ type: SET_LOADING, payload: true });
+    const allAttendanceData = { ...attendanceState.attendanceData, institute: InstituteId };
+
+    commonDispatch({ type: SET_LOADING, payload: true });
     const errors = attendanceValidation(allAttendanceData);
 
     if (errors.length > 0) {
-      localDispatch({ type: SET_ERROR_MESSAGE, payload: errors });
-      localDispatch({ type: SET_ERROR, payload: true });
-      localDispatch({ type: SET_LOADING, payload: false });
+      commonDispatch({
+        type: SET_ERROR,
+        payload: true,
+      });
+      commonDispatch({
+        type: SET_ERROR_MESSAGE,
+        payload: errors,
+      });
+      commonDispatch({ type: SET_LOADING, payload: false });
     } else {
       try {
-        // create attendance using API
-        // console.log("attendance status :" + attendanceData.status);
-
-        localDispatch({
-          type: SET_ATTENDANCE_DATA,
-          payload: allAttendanceData,
-        });
-
-        // Object.values(allAttendanceData).map((attendance)=>{
-        //   console.log("attendanceData : " + attendance);
-        // });
         await takeOneAttendance(allAttendanceData);
-        localDispatch({ type: SET_LOADING, payload: false });
-        localDispatch({ type: SET_ERROR, payload: false });
-        localDispatch({ type: SET_ERROR_MESSAGE, payload: [] });
+        commonDispatch({
+          type: SET_ERROR,
+          payload: false,
+        });
+        commonDispatch({
+          type: SET_ERROR_MESSAGE,
+          payload: [],
+        });
+        commonDispatch({ type: SET_LOADING, payload: false });
       } catch (error) {
-        localDispatch({
+        commonDispatch({
+          type: SET_ERROR,
+          payload: true,
+        });
+        commonDispatch({
           type: SET_ERROR_MESSAGE,
           payload: ["Failed to create attendance"],
         });
-        localDispatch({ type: SET_ERROR, payload: true });
-        localDispatch({ type: SET_LOADING, payload: false });
+        commonDispatch({ type: SET_LOADING, payload: false });
       }
     }
   };
 
-  if (loading) {
-    return <Loader />;
-  } else {
-    return (
-      <>
-        {error && (
-          <PopupMSG
-            color={"bg-red-500"}
-            errors={
-              errorMessage.length > 0 ? errorMessage : "Invalid Credentials"
-            }
-            closePopup={closePopup}
+  const closePopup = () => {
+    commonDispatch({
+      type: SET_ERROR,
+      payload: false,
+    });
+  };
+
+  return (
+    <>
+      {error && (
+        <PopupMSG
+          color="bg-red-500"
+          errors={errorMessage.length > 0 ? errorMessage : "Invalid Credentials"}
+          closePopup={closePopup}
+        />
+      )}
+      
+      {loading && <Loader />}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[50vh] mx-auto mt-[6%]"
+      >
+        <div className="w-[45%] relative">
+          <InputField
+            name={"rollno"}
+            handlechange={handleStudentRollno}
+            value={attendanceState.attendanceData.rollno}
+            error={error}
           />
-        )}
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-row justify-around items-start px-[2%] py-[3%] bg-gray-200 border w-[700px] h-[50vh] mx-auto mt-[6%]"
-        >
-          <div className="w-[45%]">
-            <InputField
-              name={"studentRollno"}
-              handlechange={handleChange}
-              value={attendanceData.studentRollno}
-              error={error}
-            />
-
-            {students.length > 0 && (
-              <ul className="absolute w-[300px] bg-white border mt-2 max-h-[150px] overflow-y-auto">
-                {students.map((student) => (
-                  <li
-                    key={student._id}
-                    onClick={() => handleStudentSelect(student.rollno)}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                  >
-                    {student.rollno}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <InputField
-              name={"staffName"}
-              handlechange={handleChange}
-              value={attendanceData.staffName}
-              error={error}
-            />
-
-            {staffs.length > 0 && (
-              <ul className="absolute w-[300px] bg-white border mt-2 max-h-[150px] overflow-y-auto">
-                {staffs.map((staff) => (
-                  <li
-                    key={staff._id}
-                    onClick={() => handleStaffSelect(staff.name)}
-                    className="cursor-pointer p-2 hover:bg-gray-200"
-                  >
-                    {staff.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <InputField
-              name={"date"}
-              handlechange={handleChange}
-              value={attendanceData.date}
-              type={"date"}
-              error={error}
-            />
-          </div>
-
-          <div className="w-[45%]">
-            <select
-              id="status"
-              name="status"
-              className="outline-none px-[5px] py-[8px] my-[2%] mt-[6%] cursor-pointer w-[100%] border border-gray-400"
-              value={attendanceData.status}
-              onChange={handleChange}
-            >
-              <option value="" disabled>
-                Status
-              </option>
-              <option value="present">Present</option>
-              <option value="absent">Absent</option>
-              <option value="od/permission">OD / Permission</option>
-            </select>
-            <InputField
-              name={"semester"}
-              handlechange={handleChange}
-              value={attendanceData.semester}
-              error={error}
-            />
-            <button
-              type="submit"
-              className="w-[100%] py-[3%] px-[2%] text-center border bg-[--primary-purpel] mt-[9%] text-white"
-            >
-              Create attendance
-            </button>
-          </div>
-        </form>
-      </>
-    );
-  }
+          {attendanceState.students.length > 0 && (
+            <ul className="absolute w-[300px] bg-white border mt-2 max-h-[150px] overflow-y-auto">
+              {attendanceState.students.map((student) => (
+                <li
+                  key={student._id}
+                  onClick={() => handleStudentSelect(student.rollno, student._id)}
+                  className="cursor-pointer p-2 hover:bg-gray-200"
+                >
+                  {student.rollno}
+                </li>
+              ))}
+            </ul>
+          )}
+          <InputField
+            name={"staffName"}
+            handlechange={handleStaffName}
+            value={attendanceState.staffName}
+            error={error}
+          />
+          {attendanceState.staffs.length > 0 && (
+            <ul className="absolute w-[300px] bg-white border mt-2 max-h-[150px] overflow-y-auto">
+              {attendanceState.staffs.map((staff) => (
+                <li
+                  key={staff._id}
+                  onClick={() => handleStaffSelect(staff.name, staff._id)}
+                  className="cursor-pointer p-2 hover:bg-gray-200"
+                >
+                  {staff.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          <InputField
+            name={"date"}
+            handlechange={handleChange}
+            value={attendanceState.attendanceData.date}
+            type={"date"}
+            error={error}
+          />
+        </div>
+        <div className="w-[45%]">
+          <select
+            id="status"
+            name="status"
+            className="outline-none px-[5px] py-[8px] my-[2%] mt-[6%] cursor-pointer w-[100%] border border-gray-400"
+            value={attendanceState.attendanceData.status}
+            onChange={handleChange}
+          >
+            <option value="" disabled>Status</option>
+            <option value="present">Present</option>
+            <option value="absent">Absent</option>
+            <option value="od/permission">OD / Permission</option>
+          </select>
+          <InputField
+            name={"semester"}
+            handlechange={handleChange}
+            value={attendanceState.attendanceData.semester}
+            error={error}
+          />
+          <button
+            type="submit"
+            className="w-[100%] py-[3%] px-[2%] text-center border bg-[--primary-purpel] mt-[9%] text-white"
+          >
+            Create attendance
+          </button>
+        </div>
+      </form>
+    </>
+  );
 };
 
 export default CreateAttendance;
