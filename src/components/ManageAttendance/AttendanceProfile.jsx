@@ -1,16 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useReducer, useState } from "react";
 import fetchAttendance from "../../utils/fetchAttendance";
-import { getInstituteId } from "../../utils";
+import useExistingUserData from "../../hooks/useExistingUserData";
 import { commonInitialState, commonReducer } from "../reducers/commonReducers";
+import { getInstituteId } from "../../utils";
 
 const AttedanceProfile = () => {
   const { studentID, date } = useParams();
-  const instituteId = getInstituteId();
+  const { existingUserType, existingUser } = useExistingUserData();
+  const instituteId = getInstituteId(existingUserType, existingUser);
   const [attendanceData, setAttendanceData] = useState([]);
   const [commonState, commonDispatch] = useReducer(commonReducer, commonInitialState);
-
-  console.log("attendanceData : "+attendanceData);
 
   useEffect(() => {
     const fetchAndSetAttendance = async () => {
