@@ -66,7 +66,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute element={<StaffProfile />} />,
       },
       {
-        path: "/dashboard/manage-attendance/:studentID",
+        path: "/dashboard/manage-attendance/:date/:studentID",
         element: <ProtectedRoute element={<AttendanceProfile />} />,
       },
       {

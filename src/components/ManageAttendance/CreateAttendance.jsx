@@ -111,7 +111,15 @@ const CreateAttendance = () => {
 
     if (errors.length > 0) {
       handleLoading(commonDispatch, false);
-      handleError(commonDispatch, errors, false);
+      handleError(commonDispatch, errors, true);
+      
+      setTimeout(() => {
+        handleError(commonDispatch, errors, false);
+      }, 2000);
+
+      console.log("error :"+errorMessage);
+
+
     } else {
       try {
         handleLoading(commonDispatch, true);
@@ -127,6 +135,9 @@ const CreateAttendance = () => {
       } catch (error) {
         handleError(commonDispatch, ["Failed to create attendance"], true);
         handleLoading(commonDispatch, false);
+        setTimeout(() => {
+          handleError(commonDispatch, [], false);
+        }, 2000);
       }
     }
   };
