@@ -1,20 +1,15 @@
-
-// api.js
 import axios from 'axios';
 
-const API_KEY = import.meta.env.VITE_API_END_POINT; // API_KEY
+const API_KEY = import.meta.env.VITE_API_END_POINT;
 
 export const refreshAccessToken = async () => {
   try {
-    const token = localStorage.getItem('authToken');
-    const response = await axios.post(`${API_KEY}/api/token/refresh-token`, {
-      token: token,
-    });
+    const response = await axios.post(`${API_KEY}/api/token/refresh-token`, {}, { withCredentials: true });
     const { accessToken } = response.data;
-    localStorage.setItem('authToken', accessToken);
+    document.cookie = `authToken=${accessToken}; path=/;`;
     return accessToken;
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    return null;
+    throw error;
   }
 };

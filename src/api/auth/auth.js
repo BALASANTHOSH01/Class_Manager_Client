@@ -28,6 +28,7 @@ const createUser = async (userData, userType) => {
 };
 
 const loginUser = async(userData, userType) =>{
+
     try {
         const getResponse = async () => {
           switch (userType) {
@@ -41,12 +42,18 @@ const loginUser = async(userData, userType) =>{
               throw new Error("Invalid user type");
           }
         };
-    
+
+        
         const response = await getResponse(); // Ensure this is awaited
+
+       Object.values(response.data.staffData).map((data)=>
+      console.log("data :"+data));
+
         if (!response) {
           console.log("No response is found.");
           throw new Error("No response received");
         }
+
         return response;
     } catch (error) {
         console.log("Error in login user:", error);

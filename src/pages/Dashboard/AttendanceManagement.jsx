@@ -19,9 +19,14 @@ const AttendanceManagement = () => {
   const date = "15-07-2024";
   const instituteId = getInstituteId(existingUserType, existingUser);
 
+  console.log("userType :"+existingUserType);
+  console.log("userData :"+Object.values(existingUser).map((data)=>data));
+
   useEffect(() => {
     fetchAttendance(commonDispatch, setAttendanceData, date);
   }, [date, instituteId, commonDispatch]);
+
+  console.log("attendanceData :"+attendanceData);
 
   if (loading) {
     return <Loader />;

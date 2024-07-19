@@ -169,7 +169,7 @@ const AccountSetting = () => {
           )}
 
           {/** Students and Staffs specific fields */}
-          {(existingUserType === "student" || existingUserType === "staff") && (
+          {(existingUserType === "student") && (
             <>
               <AccountSettingInputField
                 name={"phoneNumber"}
@@ -188,6 +188,32 @@ const AccountSetting = () => {
                   isEdit
                     ? currentUserDetails.parentNumber
                     : existingUser.parentNumber
+                }
+                handlechange={handleChange}
+                error={error}
+                isEditable={isEdit}
+              />
+              <AccountSettingInputField
+                name={"institute"}
+                value={
+                  isEdit ? currentUserDetails.institute : existingUser.institute
+                }
+                handlechange={handleChange}
+                error={error}
+                isEditable={isEdit}
+              />
+            </>
+          )}
+
+          {/** Students and Staffs specific fields */}
+          {(existingUserType === "staff") && (
+            <>
+              <AccountSettingInputField
+                name={"phoneNumber"}
+                value={
+                  isEdit
+                    ? currentUserDetails.phoneNumber
+                    : existingUser.phoneNumber
                 }
                 handlechange={handleChange}
                 error={error}

@@ -80,6 +80,8 @@ const Login = () => {
     try {
       handleLoading(commonDispatch, true);
 
+      console.log("login data :"+Object.values(loginData).map((data)=>data));
+
       const response = await loginUser(loginData, userType);
       if (!response) {
         throw new Error("No response found.");
@@ -88,14 +90,41 @@ const Login = () => {
       // console.log("response token :"+response.data.token);
       localStorage.setItem("authToken", response.data.token);
 
-      // redux current user part
-      await dispatch(
-        setCurrentUser({
-          userData: response.data.instituteData,
-          userType: userType,
-          userId: response.data.instituteData._id,
-        })
-      );
+      if(userType === "staff"){
+
+        // redux current user part
+        await dispatch(
+          setCurrentUser({
+            userData: response.data.staffData,
+            userType: userType,
+            userId: response.data.staffData._id,
+          })
+        );
+
+      } else if(userType === "insitute"){
+
+        // redux current user part
+        await dispatch(
+          setCurrentUser({
+            userData: response.data.instituteData,
+            userType: userType,
+            userId: response.data.instituteData._id,
+          })
+        );
+
+      } else if(userType === "student"){
+
+        // redux current user part
+        await dispatch(
+          setCurrentUser({
+            userData: response.data.studentData,
+            userType: userType,
+            userId: response.data.studentData._id,
+          })
+        );
+
+      }
+
 
       // set token
       await setToken(response.data.token);
@@ -164,7 +193,6 @@ const Login = () => {
           className="outline-none px-[5px] py-[8px] my-[2%] cursor-pointer w-[100%] border border-gray-400"
           value={userType}
           onChange={(e) => {
-            handleChange(e);
             handleUserType(e.target.value);
           }}
         >

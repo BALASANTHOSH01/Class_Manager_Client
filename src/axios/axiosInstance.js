@@ -1,36 +1,30 @@
-import axios from "axios";
-import { refreshAccessToken } from "../api/api";
-import {jwtDecode} from "jwt-decode";
+import axios from 'axios';
+import { refreshAccessToken } from '../api/api';
 
-const API_KEY = import.meta.env.VITE_API_END_POINT; // API_KEY
-
-// create axios connection
+// Create axios instance
 const axiosInstance = axios.create({
-  baseURL: API_KEY,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: import.meta.env.VITE_API_END_POINT, // Replace with your API endpoint
+  withCredentials: true, // Include cookies in requests
 });
 
 // Request interceptor
 axiosInstance.interceptors.request.use(
-  async (config) => {
-    let token = localStorage.getItem("authToken");
+  (config) => {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('authToken='))
+      ?.split('=')[1];
+
     if (token) {
-      const { exp } = jwtDecode(token);
-      if (Date.now() >= exp * 1000) {
-        // Token expired, attempt to refresh it
-        token = await refreshAccessToken();
-      }
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
-
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
@@ -39,15 +33,25 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const token = await refreshAccessToken();
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-      return axiosInstance(originalRequest);
-    } else if(error.response){
-      return error.response
+
+    if (error.response) {
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+          const token = await refreshAccessToken(); // Refresh token
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          console.error('Error refreshing token:', refreshError);
+          return Promise.reject(refreshError);
+        }
+      } else {
+        return Promise.reject(error.response);
+      }
+    } else {
+      console.error('Error:', error);
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
   }
 );
 
