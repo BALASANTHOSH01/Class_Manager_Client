@@ -1,6 +1,5 @@
 # Class Manager
 
-![Class Manager Logo](https://classmanager.vercel.app/logo.png)
 
 Class Manager is a student management software that staffs and institutions can use to manage their students' records in the most effective way. This software reduces the amount of time taken to manage the students and staff of an institution. Main features are attendance management, push notifications, etc. The software is still in progress to enhance the features and functionalities.
 
